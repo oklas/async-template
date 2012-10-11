@@ -1,0 +1,17 @@
+[% # BLOCK blck; "I'm blck"; END %]
+[% USE Dumper %]
+[% USE s = Second %]
+first chunk
+[% EVENT evres = s.start(-1) %]
+on first event: [% Dumper.dump(evres) %]
+[% EVENT evres = s.start(1) %]
+on second event: [% Dumper.dump(evres) %]
+
+[%#
+'before event if';
+IF s;
+   EVENT s.start(1) ;
+      'on event';
+END;
+'after event if';
+%]

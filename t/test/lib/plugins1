@@ -1,0 +1,9 @@
+[% USE s = Second %]
+first chunk
+if: [% IF 1; '1'; END %]
+[% EVENT evres = s.start(-1) %]
+if: [% IF 2; '2'; END %]
+on first event: [% IF evres.error; 'error'; END %]
+[% EVENT evres = s.start(1) %]
+if: [% IF 3; '3'; END %]
+on second event: [% evres.result %]
