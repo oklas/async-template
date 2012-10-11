@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/lib/Template/Plugin/Second.pm
+t/generic.t
+t/plugins.t
+lib/Template/Event.pm
+lib/Template/Event/Context.pm
+lib/Template/Event/Directive.pm
+lib/Template/Event/Grammar.pm
