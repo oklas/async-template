@@ -22,13 +22,12 @@ use Template::Test;
 use Template::Plugins;
 use Template::Event;
 use Template::Constants qw( :debug );
-use AnyEvent;
 use Cwd qw( abs_path );
 $^W = 1;
 
 my $DEBUG = grep(/^--?d(debug)?$/, @ARGV);
 
-$DEBUG = 1;
+#$DEBUG = 1;
 #$Template::Test::DEBUG = 0;
 #$Template::Plugins::DEBUG = 0;
 
@@ -36,16 +35,11 @@ my $dir = abs_path( -d 't' ? 't/test/plugin' : 'test/plugin' );
 my $src = abs_path( -d 't' ? 't/test/lib' : 'test/lib' );
 unshift(@INC, $dir);
 
-my $w = AE::cv; # stores whether a condition was flagged
-
 my $tt1 = Template::Event->new({      
-    EVENT => sub {
-       my $res = shift;
-       print $res; $w->send
-    },
     INCLUDE_PATH => $src,
 COMPILE_DIR=>'.',
     DEBUG        => $DEBUG ? DEBUG_PLUGINS : 0,
+#    DEBUG => DEBUG_ALL,
 }) || die Template->error();
 
 
@@ -54,14 +48,6 @@ my $tt = [
     tt1 => $tt1,
 ];
 
-
-$tt1->process('plugins1');
-$w->recv; 
-
-#$tt1->{tt}->template('plugins1')->process('plugins1');
-#my $d = $tt1->context()->template('plugins1');
-#print $d->process($tt1->context());
-#$d->as_perl();
 
 test_expect(\*DATA, $tt, &callsign());
 
@@ -72,8 +58,9 @@ __END__
 # basic plugin loads
 #------------------------------------------------------------------------
 -- test --
-[% USE Second() -%]
+[% USE Second(); IF Second; 'original'; END -%]
 -- expect --
+original
 
 
 #------------------------------------------------------------------------
@@ -81,9 +68,80 @@ __END__
 #------------------------------------------------------------------------
 -- test --
 -- use tt1 --
-[% USE s = Second() -%]
-[% EVENT s.start( 1 ) %]
+[% USE Second(); IF Second; 'modern'; END -%]
 -- expect --
+modern
 
+-- test --
+[% USE s = Second -%]
+[% res = undef -%]
+first chunk
+[% EVENT res = s.start(-1) -%]
+event (negative): [% IF res.error; 'error'; END %]
+[% EVENT res = s.start(1) -%]
+event (positive): [% res.result %]
+-- expect --
+first chunk
+event (negative): error
+event (positive): ok
 
+-- test --
+original nested while
+[%
+   i = 3;
+   a = [ '-', 'c', 'b', 'a' ];
+   WHILE i;
+     j = 3;
+     i;
+     WHILE j;
+       a.$j;
+       j = j - 1;
+     END;
+     "\n";
+     i = i - 1;
+   END;
+   "done";
+%]
+-- expect --
+original nested while
+3abc
+2abc
+1abc
+done
+
+-- test --
+[% USE s = Second -%]
+[%
+   i = 3;
+   a = [ '-', 'c', 'b', 'a' ];
+   WHILE i;
+     j = 3;
+     res = undef;
+     EVENT res = s.start(0);
+     "$i : ${res.result}\n";
+     WHILE j;
+       '  '; a.$j;
+       res = undef;
+       EVENT res = s.start(0);
+       " : ${res.result}\n";
+       j = j - 1;
+     END;
+     i = i - 1;
+   END;
+   "done";
+%]
+-- expect --
+3 : ok
+  a : ok
+  b : ok
+  c : ok
+2 : ok
+  a : ok
+  b : ok
+  c : ok
+1 : ok
+  a : ok
+  b : ok
+  c : ok
+done
 

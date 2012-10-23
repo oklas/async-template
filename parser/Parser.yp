@@ -63,16 +63,23 @@
 # START AND TOP-LEVEL RULES
 #--------------------------------------------------------------------------
 
-template:   eventblock              { $factory->template(
-                                      "\$output=\$context->event_back()->{output};\n".$_[1]) }
+template:   templatecode            { $factory->template( $_[1] )         }
 ;
 
-eventblock: chunks                  { $factory->block([ @{$_[1]}, 
-                                      $factory->event_finalize ])         }
-        |   chunks event            { $factory->block([ @{$_[1]}, $_[2] ])}
-        |   event                   { $factory->block( @$_[2] )           }
-        |   /* NULL */              { $factory->block(
-                                     [ $factory->event_finalize ])        }
+templatecode:eventblock END         { $_[0]->rollback_token; $_[1]        }
+        |   finalblock END          { $_[0]->rollback_token; $_[1]        }
+        |   eventblock              { $_[1]                               }
+        |   finalblock              { $_[1]                               }
+;
+
+eventblock: chunks event            { $factory->block([ @{$_[1]}, $_[2] ])}
+        |   event                   { $factory->block( @$_[1] )           }
+;
+
+finalblock: chunks                  { $factory->block([ @{$_[1]}, 
+                                      $factory->event_finalize() ])       }
+        |   /* NULL */              { $factory->block( [
+                                      $factory->event_finalize() ])       }
 ;
 
 block:      chunks                  { $factory->block($_[1])              }
@@ -84,10 +91,16 @@ chunks:     chunks chunk            { push(@{$_[1]}, $_[2])
         |   chunk                   { defined $_[1] ? [ $_[1] ] : [ ]     }
 ;
 
-event:      EVENT eventvar ';'
-              template              { $_[0]->location() .
-                                      $factory->define_event($_[2], $_[4]) }
+event:      event_plug              { $_[1]                               }
+        |   event_loop              { $_[1]                               }
 ;
+
+event_plug:  EVENT eventvar ';'
+              template              { $_[0]->location() .
+                                      $factory->define_event(
+                                        $_[2]->[0], $_[2]->[1], $_[4])    }
+;
+
 eventvar:   ident                   { [ undef, $factory->ident($_[1]) ]   }
         |   IDENT ASSIGN ident      { [ $_[1], $factory->ident($_[3]) ]   }
 ;
@@ -183,12 +196,30 @@ case:       CASE term ';' block
         |   /* NULL */              { [ undef ]                           }
 ;
 
-loop:       FOR loopvar ';'         { $_[0]->enter_block('FOR')           }
-                block END           { $factory->foreach(@{$_[2]}, $_[5], $_[0]->leave_block)  }
-        |   atomexpr FOR loopvar    { $factory->foreach(@{$_[3]}, $_[1])  }
-        |   WHILE expr ';'          { $_[0]->enter_block('WHILE')         }
-              block END             { $factory->while(@_[2, 5], $_[0]->leave_block) }
+event_loop: loopwhilevar ';'
+              eventblock END
+              templatecode          { $factory->event_while(@_[1, 3, 5],
+                                      $_[0]->leave_block)  }
+;
+
+loop:       loopwf                  { $_[1]                               }
+        |   atomloop                { $_[1]                               }
+;
+
+atomloop:   atomexpr FOR loopvar    { $factory->foreach(@{$_[3]}, $_[1])  }
         |   atomexpr WHILE expr     { $factory->while(@_[3, 1]) }
+;
+
+loopwf:     loopforvar ';'
+              block END             { $factory->foreach(@{$_[1]}, $_[3], $_[0]->leave_block)  }
+        |   loopwhilevar ';'
+              block END             { $factory->while(@_[1, 3], $_[0]->leave_block) }
+;
+
+loopforvar: FOR loopvar             { $_[0]->enter_block('FOR'); $_[2]    }
+;
+
+loopwhilevar: WHILE expr            { $_[0]->enter_block('WHILE'); $_[2]  }
 ;
 
 loopvar:    IDENT ASSIGN term args  { [ @_[1, 3, 4] ]                     }

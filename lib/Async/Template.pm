@@ -10,9 +10,9 @@ use warnings;
 
 our $VERSION = '0.01';
 
+use Template::Event::Parser;
 use Template::Event::Grammar;
 use Template::Event::Context;
-use Template::Parser;
 use Template::Event::Directive;
 
 
@@ -24,35 +24,78 @@ sub new {
    $Template::Config::CONTEXT = 'Template::Event::Context';
    $Template::Config::FACTORY = 'Template::Event::Directive';
 
+# WARN! TODO: incompatible with original tewmplate
+# impossible to solve upgrade Template does not
+# recompile unchaged modules, incomptible ...
+# $output and \$output need to test mem usage
+# about 2 commented string of code below
+# not good idea try to solve in process:
+#      my $oldoutput = $Template::Directive::OUTPUT;
+#      $Template::Directive::OUTPUT = $oldoutput;
+# so
+      $Template::Directive::OUTPUT = '${$output} .= ';
+
    my $config = $_[0];
-   unless( $config->{EVENT} ) {
-      die 'EVENT cofig options for '.__PACKAGE__.'->new() must be specified'
+   
+   if( $config->{BLOCKER} && ! $config->{EVENT} ) {
+      die 'EVENT cofig options for '.__PACKAGE__.'->new() must be specified if BLOCKER specified'
+   } elsif( ! $config->{BLOCKER} && ! $config->{EVENT} ) {
+      require 'AnyEvent.pm';
+      $self->{BLOCKER} = sub {
+          $self->{_blockcv}->recv;
+      };
+      $self->{EVENT} = sub {
+         my $output = shift;
+         $self->{_output} = $output;
+         $self->{_blockcv}->send;
+      };
    }
-   $self->{EVENT} = $config->{EVENT};
+   $self->{config} = $config;
    $self->{tt} = Template->new({
-      %{$config},
+      %{ $self->{config} },
+      PARSER  => Template::Event::Parser->new( %{$config},
       GRAMMAR => Template::Event::Grammar->new( %{$config } ),
       FACTORY => Template::Event::Directive->new( %{$config} ),
+      ),
    });
    $self
 }
 
 sub process {
-   my $self = shift;
+   my ($self, $template, $vars, $outstream, @opts) = @_;
+   my $options = (@opts == 1) && ref($opts[0]) eq 'HASH'
+      ? shift(@opts) : { @opts };
+   $self->{_blockcv} = AnyEvent->condvar;
    my $context = $self->{tt}->context();
+   my $output = '';
+   $context->{_event_output} = \$output;
    my $cb = $self->{EVENT};
    my $event = sub {
       my $context = shift;
-      my $output = shift;
-      $cb->( $output );
+      $cb->( ${$context->event_output()} );
    };
    $context->event_push( {
-      resvar => undef,
       event => $event,
-      output => '',
+      output => \$output,
+      resvar => undef,
    } );
-   $context->process( @_ )
-   ;
+   eval{
+      #return $self->{tt}->process( $template, $vars, $outstream );
+      $self->{tt}->context()->process( $template, $vars );
+   };
+   return $self->{tt}->error($@)
+        if $@;
+   $self->{BLOCKER}->()
+      if( $self->{BLOCKER} );
+   $outstream ||= $self->{tt}->{OUTPUT};
+   if( defined $self->{_output} ) {
+     my $error;
+     return $self->{tt}->error($error)
+        if ($error = &Template::_output( $outstream, $context->event_output, $options ) );
+     return 1;
+   } else {
+      die 'not implemented';
+   }
 }
 
 sub context {
