@@ -14,7 +14,7 @@ lib\Async\Template\Parser.pm@@/main/3
 lost+found@@/main/0
 parser@@/main/2
 parser\Grammar.pm.skel@@/main/1
-parser\Parser.yp@@/main/6
+parser\Parser.yp@@/main/2
 parser\README@@/main/1
 parser\yc@@/main/1
 t@@/main/1
