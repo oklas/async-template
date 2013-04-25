@@ -73,7 +73,7 @@ templatecode:eventblock END         { $_[0]->rollback_token; $_[1]        }
 ;
 
 eventblock: chunks event            { $factory->block([ @{$_[1]}, $_[2] ])}
-        |   event                   { $factory->block( @$_[1] )           }
+        |   event                   { $factory->block( [ $_[1] ] )        }
 ;
 
 finalblock: chunks                  { $factory->block([ @{$_[1]}, 
@@ -91,12 +91,13 @@ chunks:     chunks chunk            { push(@{$_[1]}, $_[2])
         |   chunk                   { defined $_[1] ? [ $_[1] ] : [ ]     }
 ;
 
-event:      event_plug              { $_[1]                               }
-        |   event_loop              { $_[1]                               }
+event:      event_plug
+        |   event_loop
+        |   event_switch
 ;
 
 event_plug:  EVENT eventvar ';'
-              template              { $_[0]->location() .
+               templatecode         { $_[0]->location() .
                                       $factory->define_event(
                                         $_[2]->[0], $_[2]->[1], $_[4])    }
 ;
@@ -184,16 +185,55 @@ else:       ELSIF expr ';'
         |   /* NULL */              { [ undef ]                           }
 ;
 
+event_switch: SWITCH expr ';'
+                block eventcase END
+                templatecode            { $factory->event_switch(@_[2, 5, 7]) }
+;
+
 switch:     SWITCH expr ';' 
               block case END        { $factory->switch(@_[2, 5])          } 
 ;
 
-case:       CASE term ';' block
-              case                  { unshift(@{$_[5]}, [ @_[2, 4] ]); 
-                                      $_[5];                              }
-        |   CASE DEFAULT ';' block  { [ $_[4] ]                           }
-        |   CASE ';' block          { [ $_[3] ]                           }
-        |   /* NULL */              { [ undef ]                           }
+eventcase:  eventcaselst                { push( @{$_[1]}, undef ); $_[1]      }
+        |   eventcaselst eventdefcase   { push( @{$_[1]}, $_[2] ); $_[1]      }
+        |   eventcaselst defcase        { push( @{$_[1]}, $_[2] ); $_[1]      }
+        |   caselst eventdefcase        { push( @{$_[1]}, $_[2] ); $_[1]      }
+;
+
+eventcaselst:
+            eventcaselst eventonecase   { push( @{$_[1]}, $_[2] ); $_[1]      }
+        |   eventcaselst onecase        { push( @{$_[1]}, $_[2] ); $_[1]      }
+        |   caselst eventonecase        { push( @{$_[1]}, $_[2] ); $_[1]      }
+#        |   onecase eventcaselst        { unshift( @{$_[2]}, $_[1] ); $_[2]   }
+#        |   onecase eventonecase        { [ $_[1], $_[2] ]                    }
+        |   eventonecase                { [ $_[1] ]                           }
+        |   eventdefcase                { [ $_[1] ]                           }
+;
+
+case:
+            caselst defcase             { push( @{$_[1]}, $_[2] ); $_[1]      }
+        |   caselst                     { push( @{$_[1]}, undef ); $_[1]      }
+; 
+
+caselst:    caselst onecase             { push( @{$_[1]}, $_[2] ); $_[1]      }
+        |   onecase                     { [ $_[1] ]                           }
+; 
+
+eventdefcase:
+            CASE DEFAULT ';' eventblock { [ $_[4] ]                       }
+        |   CASE ';' eventblock         { [ $_[3] ]                       }
+;
+
+defcase:
+            CASE DEFAULT ';' block      { $_[4]                           }
+        |   CASE ';' block              { $_[3]                           }
+;
+
+eventonecase:
+            CASE term ';' eventblock    { [ $_[2], $_[4], 1 ]                 }
+;
+
+onecase:    CASE term ';' block         { [ $_[2], $_[4] ]                    }
 ;
 
 event_loop: loopwhilevar ';'

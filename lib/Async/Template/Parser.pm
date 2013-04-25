@@ -162,6 +162,7 @@ sub _parse {
             $action = $state->{'DEFAULT'};
         }
 
+#warn "$stateno ".($token||'').' '.($value||'').' '.($action||'')."\n";
         # ERROR: no ACTION
         last unless defined $action;
 

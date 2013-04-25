@@ -58,6 +58,7 @@ __END__
 # basic plugin loads
 #------------------------------------------------------------------------
 -- test --
+[%# try original event -%]
 [% USE Second(); IF Second; 'original'; END -%]
 -- expect --
 original
@@ -68,11 +69,13 @@ original
 #------------------------------------------------------------------------
 -- test --
 -- use tt1 --
+[%# try modern event -%]
 [% USE Second(); IF Second; 'modern'; END -%]
 -- expect --
 modern
 
 -- test --
+[%# event call and plugin -%]
 [% USE s = Second -%]
 [% res = undef -%]
 first chunk
@@ -86,7 +89,7 @@ event (negative): error
 event (positive): ok
 
 -- test --
-original nested while
+[%# original nested while -%]
 [%
    i = 3;
    a = [ '-', 'c', 'b', 'a' ];
@@ -103,13 +106,13 @@ original nested while
    "done";
 %]
 -- expect --
-original nested while
 3abc
 2abc
 1abc
 done
 
 -- test --
+[%# evented nested while -%]
 [% USE s = Second -%]
 [%
    i = 3;
@@ -144,4 +147,31 @@ done
   b : ok
   c : ok
 done
+
+-- test --
+[%# evented switch in while -%]
+[%
+USE s = Second;
+n = 4;
+WHILE n;
+   SWITCH n;
+   CASE '1';     '1';
+   CASE DEFAULT; 'd';
+   END;
+
+   SWITCH n;
+   CASE '1'; 'a';
+   CASE '2'; '2'; EVENT res = s.start(0); 'e';
+   CASE '3'; '3';
+   CASE DEFAULT; 'D'; EVENT res = s.start(0); 'E';
+   END;
+   "q\n";
+   n = n - 1;
+END
+%]
+-- expect -- 
+dDEq
+d3q
+d2eq
+1aq
 

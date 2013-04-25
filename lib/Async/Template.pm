@@ -37,10 +37,12 @@ sub new {
 
    my $config = $_[0];
    
+   $self->{EVENT} = $config->{EVENT};
    if( $config->{BLOCKER} && ! $config->{EVENT} ) {
       die 'EVENT cofig options for '.__PACKAGE__.'->new() must be specified if BLOCKER specified'
    } elsif( ! $config->{BLOCKER} && ! $config->{EVENT} ) {
       require 'AnyEvent.pm';
+      $self->{_ourblocker} = 1;
       $self->{BLOCKER} = sub {
           $self->{_blockcv}->recv;
       };
@@ -65,10 +67,16 @@ sub process {
    my ($self, $template, $vars, $outstream, @opts) = @_;
    my $options = (@opts == 1) && ref($opts[0]) eq 'HASH'
       ? shift(@opts) : { @opts };
-   $self->{_blockcv} = AnyEvent->condvar;
+   if( $self->{_ourblocker} ) {
+      require 'AnyEvent.pm';
+      $self->{_blockcv} = AnyEvent->condvar;
+   }
+   ( defined $outstream && 'SCALAR' ne ref $outstream  ) &&
+      die 'only string ref possible as outstream';
    my $context = $self->{tt}->context();
-   my $output = '';
-   $context->{_event_output} = \$output;
+   my $outstr = '';
+   my $output = 'SCALAR' eq ref $outstream ? $outstream : \$outstr;
+   $context->{_event_output} = $output;
    my $cb = $self->{EVENT};
    my $event = sub {
       my $context = shift;
@@ -76,7 +84,7 @@ sub process {
    };
    $context->event_push( {
       event => $event,
-      output => \$output,
+      output => $output,
       resvar => undef,
    } );
    eval{
@@ -84,26 +92,19 @@ sub process {
       $self->{tt}->context()->process( $template, $vars );
    };
    return $self->{tt}->error($@)
-        if $@;
+      if $@;
    $self->{BLOCKER}->()
       if( $self->{BLOCKER} );
    $outstream ||= $self->{tt}->{OUTPUT};
-   if( defined $self->{_output} ) {
-     my $error;
-     return $self->{tt}->error($error)
-        if ($error = &Template::_output( $outstream, $context->event_output, $options ) );
-     return 1;
-   } else {
-      die 'not implemented';
-   }
+   return 1;
 }
 
 sub context {
-   my $self = shift;
-   $self->{tt}->context()
+   $_[0]->{tt}->context()
 }
 
 sub output {
+   $_[0]->context->event_output()
 }
 
 sub error {

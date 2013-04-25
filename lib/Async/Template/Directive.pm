@@ -59,6 +59,7 @@ EOF
 sub define_event {
    my ( $self, $resvar, $expr, $event ) = @_;
    $resvar = $resvar ? "'$resvar'" : 'undef';
+   $event = $self->event_proc( $event );
    return << "END";
    
    # EVENT
@@ -124,6 +125,74 @@ $block
    return \$output;
 EOF
 }
+
+#------------------------------------------------------------------------
+# evbent_switch($expr, \@case)                             [% SWITCH %]
+#                                                          [% CASE foo %]
+#                                                             ...
+#                                                          [% END %]
+#------------------------------------------------------------------------
+
+sub event_switch {
+   my ($self, $expr, $case, $tail) = @_;
+   my @case = @$case;
+   my ($evented, $calltail,$pct, $match, $block, $default);
+   my $caseblock = '';
+
+   $default = pop @case;
+
+   $calltail = <<EOF;
+\$context->event_push( {
+   event => \$event_tail,
+} );
+EOF
+
+   foreach $case (@case) {
+      $match = $case->[0];
+      $block = $case->[1];
+      $evented = $case->[2];
+#      $block = pad($block, 1) if $PRETTY;
+
+      $pct = $evented ? \$calltail : \'';
+
+      $caseblock .= <<EOF;
+\$_tt_match = $match;
+\$_tt_match = [ \$_tt_match ] unless ref \$_tt_match eq 'ARRAY';
+if (grep(/^\\Q\$_tt_result\\E\$/, \@\$_tt_match)) {
+${$pct} $block 
+   last EVENTSWITCH;
+}
+EOF
+
+   } # foreach
+
+   if( defined $default ) {
+      if( 'ARRAY' eq ref $default ) {
+         #$default = 'my $event = ' . $self->event_proc( $default->[0] ) . ';';
+         $default = $default->[0];
+      }
+      $caseblock .= $calltail . $default
+   }
+   $tail = 'my $event_tail = ' . $self->event_proc( $tail ) . ';';
+#    $caseblock = pad($caseblock, 2) if $PRETTY;
+
+return <<EOF;
+
+# EVENT SWITCH
+$tail
+do {
+   my \$_tt_result = $expr;
+   my \$_tt_match;
+   EVENTSWITCH: {
+$caseblock
+   }
+};
+    
+   \$event_tail->( \$context );
+EOF
+}
+
+
 
 
 1;
