@@ -32,7 +32,7 @@ sub event_done {
       $self->stash->set( $ev->{resvar}, $res );
    }
 
-# TODO: here exeptions not hadled, and not evented
+# TODO: here exeptions not handled, and not reevented
 
    my $output = $ev->{event}->( $self, \$res );
    $self->{event_top} = undef;

@@ -6,7 +6,7 @@ lib@@/main/2
 lib\Async@@/main/3
 lib\Async\Event.pm@@/main/3
 lib\Async\Template@@/main/2
-lib\Async\Template\Context.pm@@/main/2
+lib\Async\Template\Context.pm@@/main/3
 lib\Async\Template\Directive.pm@@/main/3
 lib\Async\Template\Document.pm@@/main/1
 lib\Async\Template\Grammar.pm@@/main/3
@@ -27,4 +27,4 @@ t\plugins.t@@/main/3
 t\test@@/main/1
 t\test\lib@@/main/1
 t\test\lib\plugins1@@/main/2
-t\test\lib\plugins2@@/main/2
+t\test\lib\plugins2@@/main/3
