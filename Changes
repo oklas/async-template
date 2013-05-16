@@ -4,3 +4,6 @@ Revision history for Perl extension Template::Event.
 	- original version; created by h2xs 1.23 with options
 		--omit-XS --skip-exporter --omit-autoload --name Template::Event
 
+
+0.02  Thu May 16 23:35:07 2013
+	- event implementation of FOREACH added

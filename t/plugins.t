@@ -48,6 +48,16 @@ my $tt = [
     tt1 => $tt1,
 ];
 
+=pod
+my $out='';
+ $tt1->process('plugins2',{},\$out)
+ ? print '!'.$out
+ : print $tt1->error();
+;
+ exit;
+=cut
+=pod
+=cut
 
 test_expect(\*DATA, $tt, &callsign());
 
@@ -167,6 +177,32 @@ WHILE n;
    END;
    "q\n";
    n = n - 1;
+END
+%]
+-- expect -- 
+dDEq
+d3q
+d2eq
+1aq
+
+-- test --
+[%# evented switch in while -%]
+[%
+USE s = Second;
+list = [ '4', 3, 2, '1' ];
+FOREACH n = list;
+   SWITCH n;
+   CASE '1';     '1';
+   CASE DEFAULT; 'd';
+   END;
+
+   SWITCH n;
+   CASE '1'; 'a';
+   CASE '2'; '2'; EVENT res = s.start(0); 'e';
+   CASE '3'; '3';
+   CASE DEFAULT; 'D'; EVENT res = s.start(0); 'E';
+   END;
+   "q\n";
 END
 %]
 -- expect -- 

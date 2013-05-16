@@ -47,9 +47,12 @@ sub event_pop {
 }
 
 sub event_top {
-   $_[0]->{event_top}
-      ? $_[0]->{event_top}
-      : $_[0]->{event_stack}->[ $#{ $_[0]->{event_stack} } ]
+   return $_[0]->{event_stack}->[ $#{ $_[0]->{event_stack} } ];
+# ( 16.05.2013 ) TODO: remove any access to 
+# $self->{event_top} if no problem appeared later
+#   $_[0]->{event_top}
+#      ? $_[0]->{event_top}
+#      : $_[0]->{event_stack}->[ $#{ $_[0]->{event_stack} } ]
 }
 
 

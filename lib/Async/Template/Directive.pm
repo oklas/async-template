@@ -21,9 +21,9 @@ sub {
    my \$stash   = \$context->stash;
    my \$output  = \$context->event_output;
    my \$_tt_error;
-   eval { BLOCK: {
+#   eval { BLOCK: {
 $block
-   } };
+#   } };
    if (\$@) {
       \$_tt_error = \$context->catch(\$@, \\\$output);
       die \$_tt_error unless \$_tt_error->type eq 'return';
@@ -125,6 +125,93 @@ $block
    return \$output;
 EOF
 }
+
+
+#------------------------------------------------------------------------
+# event_for($target, $list, $args, $tail, $block)
+#                                           [% FOREACH x = [ foo bar ] %]
+#                                              ...
+#                                           [% END %]
+#------------------------------------------------------------------------
+
+sub event_for {
+    my ($self, $target, $list, $args, $block, $tail, $label) = @_;
+    # $args is not used in original code
+    $label ||= 'LOOP';
+
+    # vars: value, list, getnext, error, oldloop
+
+    my ($loop_save, $loop_set, $loop_restore, $setiter);
+    if ($target) {
+        $loop_save    = 'eval { $evtop->{oldloop} = ' . $self->ident(["'loop'"]) . ' }';
+        $loop_set     = "\$stash->{'$target'} = \$evtop->{value}";
+        $loop_restore = "\$stash->set('loop', \$evtop->{oldloop})";
+    }
+    else {
+        $loop_save    = '$stash = $context->localise()';
+#       $loop_set     = "\$stash->set('import', \$evtop->{value}) "
+#                       . "if ref \$value eq 'HASH'";
+        $loop_set     = "\$stash->get(['import', [\$evtop->{value}]]) "
+                        . "if ref \$evtop->{value} eq 'HASH'";
+        $loop_restore = '$stash = $context->delocalise()';
+    }
+#    $block = pad($block, 3) if $PRETTY;
+
+   $block = << "EOF";
+   my \$evtop = \$context->event_top();
+   if( \$evtop->{getnext} ) {
+      (\$evtop->{value}, \$evtop->{error}) =
+	 \$evtop->{list}->get_next();
+   } else {
+      \$evtop->{getnext} = 1;
+   }
+   if( ! \$evtop->{error} ) {
+$loop_set;
+      \$context->event_push( {
+         resvar => undef,
+         event  => \$event,
+      } );
+do{
+$block
+};
+   } else {
+$loop_restore;
+      \$evtop->{error} = 0
+	 if \$evtop->{error} &&
+	    \$evtop->{error} eq Template::Constants::STATUS_DONE;
+      die \$evtop->{error}
+	 if \$evtop->{error};
+$tail
+   }
+EOF
+
+   $block = $self->event_proc($block);
+
+   return << "EOF";
+
+   # EVENT $label DECLARE
+   my \$event;
+   \$event =
+$block 
+;
+
+   # EVENT $label STARTUP
+   my \$evtop = \$context->event_top();
+   \$evtop->{list} = $list;
+   unless (UNIVERSAL::isa(\$evtop->{list}, 'Template::Iterator')) {
+      \$evtop->{list} = 
+         Template::Config->iterator(\$evtop->{list})
+         || die \$Template::Config::ERROR, "\\n"; 
+   }
+   (\$evtop->{value}, \$evtop->{error}) = \$evtop->{list}->get_first();
+$loop_save;
+   \$stash->set('loop', \$evtop->{list});
+   \$event->( \$context );
+   return \$output;
+EOF
+
+}
+
 
 #------------------------------------------------------------------------
 # evbent_switch($expr, \@case)                             [% SWITCH %]

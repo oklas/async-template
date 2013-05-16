@@ -8,7 +8,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Template::Event::Parser;
 use Template::Event::Grammar;
@@ -87,10 +87,10 @@ sub process {
       output => $output,
       resvar => undef,
    } );
-   eval{
+#   eval{
       #return $self->{tt}->process( $template, $vars, $outstream );
       $self->{tt}->context()->process( $template, $vars );
-   };
+#   };
    return $self->{tt}->error($@)
       if $@;
    $self->{BLOCKER}->()
@@ -116,7 +116,6 @@ sub error {
 
 1;
 
-1;
 __END__
 # Below is stub documentation for your module. You'd better edit it!
 

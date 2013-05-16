@@ -240,6 +240,10 @@ event_loop: loopwhilevar ';'
               eventblock END
               templatecode          { $factory->event_while(@_[1, 3, 5],
                                       $_[0]->leave_block)  }
+        |   loopforvar ';'
+              eventblock END
+              templatecode          { $factory->event_for(@{$_[1]},
+                                      @_[3, 5], $_[0]->leave_block)       }
 ;
 
 loop:       loopwf                  { $_[1]                               }
