@@ -48,6 +48,11 @@ my $tt = [
     tt1 => $tt1,
 ];
 
+# cat ~/main/dist/Template-Event/t/usr/home/zYL1WK4y/main/dist/Template-Event/t/test/lib/plugins2
+# rm ~/main/dist/Template-Event/t/usr/home/zYL1WK4y/main/dist/Template-Event/t/test/lib/plugins2
+# ( cd ~/main/dist/Template-Event/t/ ; perl plugins.t )
+# ( cd ~/main/dist/Template-Event/parser/ ; ./yc )^M
+
 =pod
 my $out='';
  $tt1->process('plugins2',{},\$out)
@@ -61,17 +66,21 @@ my $out='';
 
 test_expect(\*DATA, $tt, &callsign());
 
-__END__
 
-
+=pod
+# original template is not work, use modern evented (-- use tt1 --)
 #------------------------------------------------------------------------
 # basic plugin loads
 #------------------------------------------------------------------------
 -- test --
 [%# try original event -%]
-[% USE Second(); IF Second; 'original'; END -%]
+original
 -- expect --
 original
+=cut
+
+
+__END__
 
 
 #------------------------------------------------------------------------
@@ -210,4 +219,31 @@ dDEq
 d3q
 d2eq
 1aq
+
+-- test --
+[%# evented PROCESS/INCLUDE directives -%]
+[%
+USE s = Second;
+n = 4;
+WHILE n;
+   SWITCH n;
+   CASE '4'; '4'; EVENT res = s.start(0); 'd';
+   CASE '3'; '3'; PROCESS evblock; 'c';
+   CASE '2'; '2'; PROCESS block; 'b';
+   CASE '1'; '1'; PROCESS block + evblock; 'a';
+   END;
+   n = n - 1;
+END;
+PROCESS evblock + block;
+
+BLOCK block;
+  "B";
+END;
+
+BLOCK evblock;
+  "E"; EVENT res = s.start(0); 'e';
+END;
+%]
+-- expect --
+4d3Eec2Bb1BEeaEeB
 

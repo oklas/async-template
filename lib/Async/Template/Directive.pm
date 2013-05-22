@@ -19,26 +19,33 @@ sub event_proc {
 sub {
    my \$context = shift || die "template sub called without context\\n";
    my \$stash   = \$context->stash;
-   my \$output  = \$context->event_output;
+   my \$out  = \$context->event_output;
    my \$_tt_error;
 #   eval { BLOCK: {
 $block
 #   } };
    if (\$@) {
-      \$_tt_error = \$context->catch(\$@, \\\$output);
+      \$_tt_error = \$context->catch(\$@, \\\$out);
       die \$_tt_error unless \$_tt_error->type eq 'return';
    }
-   return \$output;
+   return '';
 }
 EOF
 }
 
 
+sub event_finalize {
+   return << "END";
+   \$context->event_done(\$out);
+END
+}
+
+
 #------------------------------------------------------------------------
-# template($block)
+# event_template($block)
 #------------------------------------------------------------------------
 
-sub template {
+sub event_template {
    my ($self, $block) = @_;
 #   $block = pad($block, 2) if $PRETTY;
 
@@ -70,15 +77,45 @@ sub define_event {
       event => \$event,
    } );
    $expr;
-   return \$output;
+   return '';
 END
 }
 
 
-sub event_finalize {
-   return << "END";
-   \$context->event_done(\$output);
-END
+#------------------------------------------------------------------------
+# include(\@nameargs)                    [% INCLUDE template foo = bar %] 
+#          # => [ [ $file, ... ], \@args ]    
+#------------------------------------------------------------------------
+
+sub include {
+   my ($self, $nameargs, $event) = @_;
+   $self->process( $nameargs, $event, 'localize me!' );
+}
+
+
+#------------------------------------------------------------------------
+# process(\@nameargs)                    [% PROCESS template foo = bar %] 
+#         # => [ [ $file, ... ], \@args ]
+#------------------------------------------------------------------------
+
+sub process {
+   my ($self, $nameargs, $event, $localize) = @_;
+   my ($file, $args) = @$nameargs;
+   my $hash = shift @$args;
+   $file = $self->filenames($file);
+   $file .= @$hash ? ', { ' . join(', ', @$hash) . ' }' : '';
+   $localize ||= '';
+   $event = $self->event_proc( $event );
+   return << "EOF";
+
+   # EVENT PROCESS
+   my \$event = $event;
+   \$context->event_push( {
+      event => \$event,
+   } );
+   \$context->process_enter($file,$localize);
+   return '';
+EOF
 }
 
 
@@ -122,7 +159,7 @@ $block
    # EVENT $label STARTUP
    \$context->event_top()->{failsafe} = $while_max;
    \$event->( \$context );
-   return \$output;
+   return '';
 EOF
 }
 
@@ -207,14 +244,14 @@ $block
 $loop_save;
    \$stash->set('loop', \$evtop->{list});
    \$event->( \$context );
-   return \$output;
+   return '';
 EOF
 
 }
 
 
 #------------------------------------------------------------------------
-# evbent_switch($expr, \@case)                             [% SWITCH %]
+# event_switch($expr, \@case)                              [% SWITCH %]
 #                                                          [% CASE foo %]
 #                                                             ...
 #                                                          [% END %]
@@ -278,8 +315,6 @@ $caseblock
    \$event_tail->( \$context );
 EOF
 }
-
-
 
 
 1;

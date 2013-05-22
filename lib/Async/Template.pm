@@ -33,7 +33,7 @@ sub new {
 #      my $oldoutput = $Template::Directive::OUTPUT;
 #      $Template::Directive::OUTPUT = $oldoutput;
 # so
-      $Template::Directive::OUTPUT = '${$output} .= ';
+      $Template::Directive::OUTPUT = '${$out} .= ';
 
    my $config = $_[0];
    
