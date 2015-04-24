@@ -5,9 +5,9 @@ README
 t/lib/Template/Plugin/Second.pm
 t/generic.t
 t/plugins.t
-lib/Template/Event.pm
-lib/Template/Event/Context.pm
-lib/Template/Event/Directive.pm
-lib/Template/Event/Document.pm
-lib/Template/Event/Grammar.pm
-lib/Template/Event/Parser.pm
+lib/Async/Template.pm
+lib/Async/Template/Context.pm
+lib/Async/Template/Directive.pm
+lib/Async/Template/Document.pm
+lib/Async/Template/Grammar.pm
+lib/Async/Template/Parser.pm

@@ -1,4 +1,4 @@
-Revision history for Perl extension Template::Event.
+Revision history for Perl extension Async::Template
 
 0.01  Mon Oct  1 03:17:34 2012
 	- original version; created by h2xs 1.23 with options
@@ -11,3 +11,4 @@ Revision history for Perl extension Template::Event.
 
 0.03  Thu May 23 01:50:05 2013
         - event implementation of PROCESS/INCLUDE added
+

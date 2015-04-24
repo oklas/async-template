@@ -20,7 +20,7 @@ use strict;
 use lib qw( t/lib ./lib ../lib ../blib/arch );
 use Template::Test;
 use Template::Plugins;
-use Template::Event;
+use Async::Template;
 use Template::Constants qw( :debug );
 use Cwd qw( abs_path );
 $^W = 1;
@@ -35,7 +35,7 @@ my $dir = abs_path( -d 't' ? 't/test/plugin' : 'test/plugin' );
 my $src = abs_path( -d 't' ? 't/test/lib' : 'test/lib' );
 unshift(@INC, $dir);
 
-my $tt1 = Template::Event->new({      
+my $tt1 = Async::Template->new({
     INCLUDE_PATH => $src,
 COMPILE_DIR=>'.',
     DEBUG        => $DEBUG ? DEBUG_PLUGINS : 0,
@@ -48,10 +48,10 @@ my $tt = [
     tt1 => $tt1,
 ];
 
-# cat ~/main/dist/Template-Event/t/usr/home/zYL1WK4y/main/dist/Template-Event/t/test/lib/plugins2
-# rm ~/main/dist/Template-Event/t/usr/home/zYL1WK4y/main/dist/Template-Event/t/test/lib/plugins2
-# ( cd ~/main/dist/Template-Event/t/ ; perl plugins.t )
-# ( cd ~/main/dist/Template-Event/parser/ ; ./yc )^M
+# cat ~/main/dist/Async-Template/t/usr/home/zYL1WK4y/main/dist/Async-Template/t/test/lib/plugins2
+# rm ~/main/dist/Async-Template/t/usr/home/zYL1WK4y/main/dist/Async-Template/t/test/lib/plugins2
+# ( cd ~/main/dist/Async-Template/t/ ; perl plugins.t )
+# ( cd ~/main/dist/Async-Template/parser/ ; ./yc )^M
 
 =pod
 my $out='';

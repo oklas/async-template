@@ -1,4 +1,4 @@
-package Template::Event::Parser;
+package Async::Template::Parser;
 
 #! @author: Serguei Okladnikov
 #! @date 15.10.2012

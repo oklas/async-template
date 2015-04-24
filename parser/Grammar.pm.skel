@@ -1,6 +1,6 @@
 #============================================================= -*-Perl-*-
 #
-# Template::Event::Grammar
+# Async::Template::Grammar
 #
 # DESCRIPTION
 #   This file based on Template::Grammar ftom Template Toolkit
@@ -31,7 +31,7 @@
 #
 #========================================================================
 
-package Template::Event::Grammar;
+package Async::Template::Grammar;
 
 use strict;
 use warnings;

@@ -1,4 +1,4 @@
-package Template::Event;
+package Async::Template;
 
 #! @author: Serguei Okladnikov
 #! @date 28.09.2012
@@ -10,10 +10,10 @@ use warnings;
 
 our $VERSION = '0.02';
 
-use Template::Event::Parser;
-use Template::Event::Grammar;
-use Template::Event::Context;
-use Template::Event::Directive;
+use Async::Template::Parser;
+use Async::Template::Grammar;
+use Async::Template::Context;
+use Async::Template::Directive;
 
 
 
@@ -21,8 +21,8 @@ use Template::Event::Directive;
 sub new {
    my $self = bless {}, shift;
 
-   $Template::Config::CONTEXT = 'Template::Event::Context';
-   $Template::Config::FACTORY = 'Template::Event::Directive';
+   $Template::Config::CONTEXT = 'Async::Template::Context';
+   $Template::Config::FACTORY = 'Async::Template::Directive';
 
 # WARN! TODO: incompatible with original tewmplate
 # impossible to solve upgrade Template does not
@@ -55,9 +55,9 @@ sub new {
    $self->{config} = $config;
    $self->{tt} = Template->new({
       %{ $self->{config} },
-      PARSER  => Template::Event::Parser->new( %{$config},
-      GRAMMAR => Template::Event::Grammar->new( %{$config } ),
-      FACTORY => Template::Event::Directive->new( %{$config} ),
+      PARSER  => Async::Template::Parser->new( %{$config},
+      GRAMMAR => Async::Template::Grammar->new( %{$config } ),
+      FACTORY => Async::Template::Directive->new( %{$config} ),
       ),
    });
    $self
@@ -121,16 +121,16 @@ __END__
 
 =head1 NAME
 
-Template::Event - Perl extension for blah blah blah
+Async::Template - Perl extension for blah blah blah
 
 =head1 SYNOPSIS
 
-  use Template::Event;
+  use Async::Template;
   blah blah blah
 
 =head1 DESCRIPTION
 
-Stub documentation for Template::Event, created by h2xs. It looks like the
+Stub documentation for Async::Template, created by h2xs. It looks like the
 author of the extension was negligent enough to leave the stub
 unedited.
 
