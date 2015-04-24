@@ -19,9 +19,9 @@
 
 : ${GRAMMAR:="Parser.yp"}
 : ${TEMPLATE:="Grammar.pm.skel"}
-: ${OUTPUT:="../lib/Template/Event/Grammar.pm"}
-if [ -e ~/main/lib/Template/Event ]; then
-   OUTPUT=`echo ~/main/lib/Template/Event/Grammar.pm`
+: ${OUTPUT:="../lib/Async/Template/Grammar.pm"}
+if [ -e ~/main/lib/Async/Template ]; then
+   OUTPUT=`echo ~/main/lib/Async/Template/Grammar.pm`
 fi
 
 

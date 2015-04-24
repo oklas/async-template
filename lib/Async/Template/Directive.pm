@@ -1,4 +1,4 @@
-package Template::Event::Directive;
+package Async::Template::Directive;
 
 #! @author: Serguei Okladnikov
 #! @date 08.10.2012

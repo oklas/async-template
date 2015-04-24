@@ -1,4 +1,4 @@
-package Template::Event::Document;
+package Async::Template::Document;
 
 use strict;
 use warnings;

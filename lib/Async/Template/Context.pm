@@ -1,4 +1,4 @@
-package Template::Event::Context;
+package Async::Template::Context;
 
 #! @author: Serguei Okladnikov
 #! @date 01.10.2012
