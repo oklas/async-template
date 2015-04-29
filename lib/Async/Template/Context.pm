@@ -20,6 +20,10 @@ sub event_output {
    $_[0]->{_event_output};
 }
 
+sub set_event_output {
+   $_[0]->{_event_output} = $_[1];
+}
+
 sub event_init {
    die 'event alredy initiated' if $_[0]->{event_init};
    $_[0]->{event_init} = 1;

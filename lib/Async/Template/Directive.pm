@@ -13,6 +13,7 @@ our $VERSION = 0.01;
 our $DYNAMIC = 0 unless defined $DYNAMIC;
 
 
+
 sub event_proc {
    my ( $self, $block ) = @_;
    return << "EOF";
@@ -165,33 +166,33 @@ EOF
 
 
 #------------------------------------------------------------------------
-# event_for($target, $list, $args, $tail, $block)
+# event_for($target, $list, $args, $block, $tail)
 #                                           [% FOREACH x = [ foo bar ] %]
 #                                              ...
 #                                           [% END %]
 #------------------------------------------------------------------------
 
 sub event_for {
-    my ($self, $target, $list, $args, $block, $tail, $label) = @_;
-    # $args is not used in original code
-    $label ||= 'LOOP';
+   my ($self, $target, $list, $args, $block, $tail, $label) = @_;
+   # $args is not used in original code
+   $label ||= 'LOOP';
 
-    # vars: value, list, getnext, error, oldloop
+   # vars: value, list, getnext, error, oldloop
 
-    my ($loop_save, $loop_set, $loop_restore, $setiter);
-    if ($target) {
-        $loop_save    = 'eval { $evtop->{oldloop} = ' . $self->ident(["'loop'"]) . ' }';
-        $loop_set     = "\$stash->{'$target'} = \$evtop->{value}";
-        $loop_restore = "\$stash->set('loop', \$evtop->{oldloop})";
-    }
-    else {
-        $loop_save    = '$stash = $context->localise()';
-#       $loop_set     = "\$stash->set('import', \$evtop->{value}) "
-#                       . "if ref \$value eq 'HASH'";
-        $loop_set     = "\$stash->get(['import', [\$evtop->{value}]]) "
-                        . "if ref \$evtop->{value} eq 'HASH'";
-        $loop_restore = '$stash = $context->delocalise()';
-    }
+   my ($loop_save, $loop_set, $loop_restore, $setiter);
+   if ($target) {
+      $loop_save    = 'eval { $evtop->{oldloop} = ' . $self->ident(["'loop'"]) . ' }';
+      $loop_set     = "\$stash->{'$target'} = \$evtop->{value}";
+      $loop_restore = "\$stash->set('loop', \$evtop->{oldloop})";
+   }
+   else {
+      $loop_save    = '$stash = $context->localise()';
+#      $loop_set     = "\$stash->set('import', \$evtop->{value}) "
+#                      . "if ref \$value eq 'HASH'";
+      $loop_set     = "\$stash->get(['import', [\$evtop->{value}]]) "
+                      . "if ref \$evtop->{value} eq 'HASH'";
+      $loop_restore = '$stash = $context->delocalise()';
+  }
 #    $block = pad($block, 3) if $PRETTY;
 
    $block = << "EOF";
@@ -313,6 +314,62 @@ $caseblock
 };
     
    \$event_tail->( \$context );
+EOF
+}
+
+
+#------------------------------------------------------------------------
+# event_capture($name, $block)
+#------------------------------------------------------------------------
+
+sub event_capture {
+   my ($self, $name, $block, $tail) = @_;
+
+   if (ref $name) {
+      if (scalar @$name == 2 && ! $name->[1]) {
+         $name = $name->[0];
+      }
+      else {
+         $name = '[' . join(', ', @$name) . ']';
+      }
+   }
+#   $block = pad($block, 1) if $PRETTY;
+
+   #$tail = $self->event_proc($tail);
+
+   my $on_capture = << "EOF";
+      my \$event_top = \$context->event_top();
+      my \$capture_var = \$event_top->{capture_var};
+      my \$push_out = \$event_top->{push_output};
+      my \$capture_out = \$context->event_output;
+      \$context->set_event_output( \$push_out );
+      \$stash->set( \$capture_var, \$\$capture_out );
+      \$out = \$push_out;
+      #\$context->event_done();
+      #my \$tail =
+$tail
+;
+#      \$tail->( \$context );
+EOF
+
+   $on_capture = $self->event_proc( $on_capture );
+
+   return << "EOF"
+
+      my \$push_out = \$context->event_output;
+      my \$capture_out = '';
+      \$context->set_event_output( \\\$capture_out );
+      my \$on_capture =
+$on_capture;
+      my \$event_top = \$context->event_top();
+      \$event_top->{push_output} = \$push_out;
+      \$event_top->{capture_var} = $name;
+      \$context->event_push( {
+         resvar => undef,
+         event  => \$on_capture,
+      } );
+
+$block
 EOF
 }
 

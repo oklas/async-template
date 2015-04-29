@@ -1,0 +1,8 @@
+notes.txt
+MYMETA.json
+MYMETA.yml
+Makefile
+blib/
+parser/Parser.output
+pm_to_blib
+stor/
