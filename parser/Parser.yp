@@ -91,8 +91,14 @@ chunks:     chunks chunk            { push(@{$_[1]}, $_[2])
         |   chunk                   { defined $_[1] ? [ $_[1] ] : [ ]     }
 ;
 
-event:      event_plug
-        |   event_loop
+event:
+            event_directive
+        |   event_plug
+        |   event_capture
+;
+
+event_directive:
+            event_loop
         |   event_switch
         |   event_process
 ;
@@ -368,11 +374,15 @@ blockargs:  metadata
         |   /* NULL */
 ;
 
-anonblock:  BLOCK blockargs ';' block END           
+anonblock:  BLOCK blockargs ';' block END
                                     { local $" = ', ';
                                       print STDERR "experimental block args: [@{ $_[2] }]\n"
                                           if $_[2];
                                       $factory->anon_block($_[4])         }
+;
+
+event_capture: ident ASSIGN mdir_ev
+                 event_template     { $factory->event_capture(@_[1, 3, 4]) }
 ;
 
 capture:    ident ASSIGN mdir       { $factory->capture(@_[1, 3])         }
@@ -381,6 +391,9 @@ capture:    ident ASSIGN mdir       { $factory->capture(@_[1, 3])         }
 macro:      MACRO IDENT '(' margs ')'
                 mdir                { $factory->macro(@_[2, 6, 4])        }
         |   MACRO IDENT mdir        { $factory->macro(@_[2, 3])           }
+;
+
+mdir_ev:    BLOCK ';' eventblock END { $_[3]                              }
 ;
 
 mdir:       directive

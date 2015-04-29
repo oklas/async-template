@@ -1,20 +1,12 @@
-[%
-USE s = Second;
-n = 4;
-WHILE n;
-   SWITCH n;
-   CASE '1';     '1';
-   CASE DEFAULT; 'd';
-   END;
-
-   SWITCH n;
-   CASE '1'; 'a';
-   CASE '2'; '2'; EVENT res = s.start(0); 'e';
-   CASE '3'; '3';
-   CASE DEFAULT; 'D'; EVENT res = s.start(0); 'E';
-   END;
-   "q\n";
-   n = n - 1;
-END
-   
+[%# evented capture anon block and edirectives -%]
+3[%
+NB = BLOCK;
+   # INCLUDE named.conf.oklas domains=['one','two'];
+   # INSERT a.tmpl;
+   USE s = Second;
+   EVENT res = s.start(1);
+   res.result;
+   " ";
+   IF 1; 1; ELSE; 0; END;
 %]
+[% END %] 2 [% NB %]
