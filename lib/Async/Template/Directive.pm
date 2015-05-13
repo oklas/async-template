@@ -104,7 +104,7 @@ sub process {
    my ($file, $args) = @$nameargs;
    my $hash = shift @$args;
    $file = $self->filenames($file);
-   $file .= @$hash ? ', { ' . join(', ', @$hash) . ' }' : '';
+   $file .= @$hash ? ', { ' . join(', ', @$hash) . ' }' : ', {}';
    $localize ||= '';
    $event = $self->event_proc( $event );
    return << "EOF";
@@ -114,7 +114,7 @@ sub process {
    \$context->event_push( {
       event => \$event,
    } );
-   \$context->process_enter($file,$localize);
+   \$context->process_enter($file,\'$localize\');
    return '';
 EOF
 }

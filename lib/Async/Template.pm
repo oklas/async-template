@@ -75,9 +75,10 @@ sub process {
       die 'only string ref possible as outstream';
    my $context = $self->{tt}->context();
    my $outstr = '';
-   my $output = 'SCALAR' eq ref $outstream ? $outstream : \$outstr;
+   my $output = defined $outstream && 'SCALAR' eq ref $outstream ?
+      $outstream : \$outstr;
    $context->{_event_output} = $output;
-   my $cb = $self->{EVENT};
+   my $cb = $options->{EVENT} || $self->{EVENT};
    my $event = sub {
       my $context = shift;
       $cb->( ${$context->event_output()} );

@@ -262,3 +262,19 @@ NB = BLOCK;
 [% END %] 2 [% NB %]
 -- expect --
 3 2 ok 1
+-- test --
+[% # check localization variable for PROCESS/INCLUDE
+USE s = Second;
+BLOCK test;
+   EVENT res = s.start(0);
+   var; ':'; 
+   var=1;
+   EVENT res = s.start(0);
+END;
+INCLUDE test;       EVENT res = s.start(0); var; " ";
+PROCESS test;       EVENT res = s.start(0); var; " ";
+INCLUDE test var=2; EVENT res = s.start(0); var; " ";
+PROCESS test var=3; EVENT res = s.start(0); var; " ";
+%]
+-- expect --
+: :1 2:1 3:1 

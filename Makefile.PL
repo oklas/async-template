@@ -8,5 +8,5 @@ WriteMakefile(
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Async/Template.pm', # retrieve abstract from module
-       AUTHOR         => 'Serguei Okladnikov oklas@span.org') : ()),
+       AUTHOR         => 'Serguei Okladnikov oklasec@gmail.com') : ()),
 );
