@@ -248,11 +248,19 @@ END;
 4d3Eec2Bb1BEeaEeB
 
 -- test --
+[%# original capture anon block and edirectives -%]
+3[%
+NB = BLOCK;
+   IF 1; 1; ELSE; 0; END;
+%]
+[% END %] 2 [% NB %]
+-- expect --
+3 2 1
+
+-- test --
 [%# evented capture anon block and edirectives -%]
 3[%
 NB = BLOCK;
-   # INCLUDE named.conf.oklas domains=['one','two'];
-   # INSERT a.tmpl;
    USE s = Second;
    EVENT res = s.start(1);
    res.result;
