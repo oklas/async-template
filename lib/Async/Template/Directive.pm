@@ -318,6 +318,37 @@ EOF
 }
 
 
+# WRNING: overloading only due to '${$ou}' instead '$output'
+#------------------------------------------------------------------------
+# capture($name, $block)
+#------------------------------------------------------------------------
+
+sub capture {
+    my ($self, $name, $block) = @_;
+
+    if (ref $name) {
+        if (scalar @$name == 2 && ! $name->[1]) {
+            $name = $name->[0];
+        }
+        else {
+            $name = '[' . join(', ', @$name) . ']';
+        }
+    }
+#    $block = pad($block, 1) if $PRETTY;
+
+    return <<EOF;
+
+# CAPTURE
+\$stash->set($name, do {
+    my \$output = ''; my \$out = \\\$output;
+$block
+    \${\$out};
+});
+EOF
+
+}
+
+
 #------------------------------------------------------------------------
 # event_capture($name, $block)
 #------------------------------------------------------------------------
