@@ -15,6 +15,9 @@ use Async::Template::Grammar;
 use Async::Template::Context;
 use Async::Template::Directive;
 
+use Template;
+use Template::Provider;
+$Template::Provider::DOCUMENT = 'Async::Template::Document';
 
 
 
@@ -23,6 +26,8 @@ sub new {
 
    $Template::Config::CONTEXT = 'Async::Template::Context';
    $Template::Config::FACTORY = 'Async::Template::Directive';
+   $Template::Config::DOCUMENT = 'Async::Template::Document';
+   $Template::Config::PROVIDER = 'Async::Template::Provider';
 
 # WARN! TODO: incompatible with original tewmplate
 # impossible to solve upgrade Template does not
@@ -56,8 +61,8 @@ sub new {
    $self->{tt} = Template->new({
       %{ $self->{config} },
       PARSER  => Async::Template::Parser->new( %{$config},
-      GRAMMAR => Async::Template::Grammar->new( %{$config } ),
-      FACTORY => Async::Template::Directive->new( %{$config} ),
+          GRAMMAR => Async::Template::Grammar->new( %{$config } ),
+          FACTORY => Async::Template::Directive->new( %{$config} ),
       ),
    });
    $self

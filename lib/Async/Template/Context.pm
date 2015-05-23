@@ -13,7 +13,8 @@ use Scalar::Util 'blessed';
 our $VERSION = 0.01;
 our $DYNAMIC = 0 unless defined $DYNAMIC;
 
-use constant DOCUMENT => Template::Context::DOCUMENT;
+#use constant DOCUMENT => Template::Context::DOCUMENT;
+use constant DOCUMENT => 'Async::Template::Document';
 
 
 sub event_output {
@@ -85,7 +86,6 @@ sub process_enter {
    my ($self, $template, $params, $localize) = @_;
    my $context = $self;
    my ($trim, $blocks) = @$self{ qw( TRIM BLOCKS ) };
-   my $compiled;
    my ($stash, $name, $tblocks, $tmpout);
    my $output = '';
     
@@ -124,12 +124,17 @@ sub process_enter {
       # save current component
       eval { $component = $stash->get('component') };
 
+      foreach my $compiled ( @{$ev->{compiled_entered}} ) {
+	  $compiled->process_leave( $context );
+      }
+
       unless( @{$ev->{template}} ) {
           $context->process_leave;
           $context->event_done( $out );
           return '';
       }
 
+      $ev->{compiled_entered} = [];
       $context->event_push( {
           event => $event,
       } );
@@ -137,7 +142,7 @@ sub process_enter {
       my $name = shift @{$ev->{template}};
 
       do {
-          $compiled = shift @{$ev->{compiled}};
+          my $compiled = shift @{$ev->{compiled}};
           my $element = ref $compiled eq 'CODE' 
               ? { (name => (ref $name ? '' : $name), modtime => time()) }
               : $compiled;
@@ -162,7 +167,9 @@ sub process_enter {
               $tmpout = &$compiled($self);
           }
           elsif (ref $compiled) {
-              $tmpout = $compiled->process($self);
+              # attention, do not change sequence of this two lines
+              push @{$ev->{compiled_entered}}, $compiled; # first
+              $tmpout = $compiled->process_enter($self);  # second
           }
           else {
               $self->throw('file', 

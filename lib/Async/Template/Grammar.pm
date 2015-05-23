@@ -14,7 +14,7 @@
 # COPYRIGHT
 #   Copyright (C) 1996-2006 Andy Wardley.  All Rights Reserved.
 #   Copyright (C) 1998-2000 Canon Research Centre Europe Ltd.
-#   Copyright (C) 2012-2012 Serguei Okladnikov
+#   Copyright (C) 2012-2015 Serguei Okladnikov
 #
 #   This module is free software; you can redistribute it and/or
 #   modify it under the same terms as Perl itself.
