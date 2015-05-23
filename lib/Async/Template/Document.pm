@@ -1,5 +1,9 @@
 package Async::Template::Document;
 
+#! @author: Serguei Okladnikov
+#! @date 23.05.2013
+#! @mailto: oklaspec@mail.ru
+
 use strict;
 use warnings;
 use base 'Template::Document';

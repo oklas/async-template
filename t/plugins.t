@@ -32,7 +32,7 @@ my $DEBUG = grep(/^--?d(debug)?$/, @ARGV);
 #$Template::Plugins::DEBUG = 0;
 
 my $dir = abs_path( -d 't' ? 't/test/plugin' : 'test/plugin' );
-my $src = abs_path( -d 't' ? 't/test/lib' : 'test/lib' );
+my $src = abs_path( -d 't' ? 't/tmpl' : 'tmpl' );
 unshift(@INC, $dir);
 
 my $tt1 = Async::Template->new({
@@ -286,3 +286,28 @@ PROCESS test var=3; EVENT res = s.start(0); var; " ";
 %]
 -- expect --
 : :1 2:1 3:1 
+
+-- test--
+[% # simple external template
+   letters = [ 'a', 'b', 'c' ];
+   numbers = [ 1, 2, 3 ];
+   FOREACH item IN letters;
+     item; INCLUDE loop_simple list=numbers;
+   END;
+%]
+-- expect --
+a123b123c123
+
+
+-- test--
+[% # evented external template
+   letters = [ 'a', 'b', 'c' ];
+   numbers = [ 1, 2, 3 ];
+   FOREACH item IN letters;
+     item; INCLUDE loop_evented list=numbers;
+   END;
+%]
+-- expect --
+a123b123c123
+
+
