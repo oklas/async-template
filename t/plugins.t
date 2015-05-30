@@ -20,74 +20,54 @@ use strict;
 use lib qw( t/lib ./lib ../lib ../blib/arch );
 use Template::Test;
 use Template::Plugins;
-use Async::Template;
 use Template::Constants qw( :debug );
-use Cwd qw( abs_path );
-$^W = 1;
+use Async::Template;
+
+use FindBin '$Bin';
+my $lib = "$Bin/lib";
+my $src = "$Bin/tmpl";
+unshift @INC, $lib;
 
 my $DEBUG = grep(/^--?d(debug)?$/, @ARGV);
 
-#$DEBUG = 1;
-#$Template::Test::DEBUG = 0;
-#$Template::Plugins::DEBUG = 0;
-
-my $dir = abs_path( -d 't' ? 't/test/plugin' : 'test/plugin' );
-my $src = abs_path( -d 't' ? 't/tmpl' : 'tmpl' );
-unshift(@INC, $dir);
-
-my $tt1 = Async::Template->new({
-    INCLUDE_PATH => $src,
-COMPILE_DIR=>'.',
-    DEBUG        => $DEBUG ? DEBUG_PLUGINS : 0,
-#    DEBUG => DEBUG_ALL,
+my $att = Async::Template->new({
+   INCLUDE_PATH => $src,
+   COMPILE_DIR  => '.',
+   DEBUG        => $DEBUG ? DEBUG_PLUGINS : 0,
+#   DEBUG        => DEBUG_ALL,
 }) || die Template->error();
 
-
 my $tt = [
-    def => Template->new(),
-    tt1 => $tt1,
+    tt  => Template->new(),
+    att => $att,
 ];
-
-# cat ~/main/dist/Async-Template/t/usr/home/zYL1WK4y/main/dist/Async-Template/t/test/lib/plugins2
-# rm ~/main/dist/Async-Template/t/usr/home/zYL1WK4y/main/dist/Async-Template/t/test/lib/plugins2
-# ( cd ~/main/dist/Async-Template/t/ ; perl plugins.t )
-# ( cd ~/main/dist/Async-Template/parser/ ; ./yc )^M
-
-=pod
-my $out='';
- $tt1->process('plugins2',{},\$out)
- ? print '!'.$out
- : print $tt1->error();
-;
- exit;
-=cut
-=pod
-=cut
 
 test_expect(\*DATA, $tt, &callsign());
 
-
 =pod
-# original template is not work, use modern evented (-- use tt1 --)
-#------------------------------------------------------------------------
-# basic plugin loads
-#------------------------------------------------------------------------
 -- test --
-[%# try original event -%]
-original
+-- use tt --
+[%# try original template -%]
+original [% "template" -%]
 -- expect --
-original
+original template
 =cut
 
 
 __END__
 
 
+-- test --
+-- use att --
+[%# try original template -%]
+original [% "template" -%]
+-- expect --
+original template
+
 #------------------------------------------------------------------------
 # load Foo plugin through custom PLUGIN_BASE
 #------------------------------------------------------------------------
 -- test --
--- use tt1 --
 [%# try modern event -%]
 [% USE Second(); IF Second; 'modern'; END -%]
 -- expect --
@@ -270,19 +250,20 @@ NB = BLOCK;
 [% END %] 2 [% NB %]
 -- expect --
 3 2 ok 1
+
 -- test --
 [% # check localization variable for PROCESS/INCLUDE
 USE s = Second;
-BLOCK test;
+BLOCK block;
    EVENT res = s.start(0);
    var; ':'; 
    var=1;
    EVENT res = s.start(0);
 END;
-INCLUDE test;       EVENT res = s.start(0); var; " ";
-PROCESS test;       EVENT res = s.start(0); var; " ";
-INCLUDE test var=2; EVENT res = s.start(0); var; " ";
-PROCESS test var=3; EVENT res = s.start(0); var; " ";
+INCLUDE block;       EVENT res = s.start(0); var; " ";
+PROCESS block;       EVENT res = s.start(0); var; " ";
+INCLUDE block var=2; EVENT res = s.start(0); var; " ";
+PROCESS block var=3; EVENT res = s.start(0); var; " ";
 %]
 -- expect --
 : :1 2:1 3:1 
@@ -309,5 +290,4 @@ a123b123c123
 %]
 -- expect --
 a123b123c123
-
 

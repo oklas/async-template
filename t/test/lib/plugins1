@@ -1,6 +1,0 @@
-[% USE s = Second %]
-first chunk
-[% EVENT evres = s.start(-1) %]
-on negative event: [% IF evres.error; 'error'; END %]
-[% EVENT evres = s.start(1) %]
-on positive event: [% evres.result %]
