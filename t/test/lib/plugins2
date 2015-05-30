@@ -1,7 +1,0 @@
-[%# original capture anon block and edirectives -%]
-3[%
-NB = BLOCK;
-   IF 1; 1; ELSE; 0; END;
-%]
-[% END %] 2 [% NB %]
-
