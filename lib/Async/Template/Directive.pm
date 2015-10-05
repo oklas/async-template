@@ -390,6 +390,7 @@ EOF
       my \$push_out = \$context->event_output;
       my \$capture_out = '';
       \$context->set_event_output( \\\$capture_out );
+      \$out = \\\$capture_out;
       my \$on_capture =
 $on_capture;
       my \$event_top = \$context->event_top();
