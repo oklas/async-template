@@ -239,17 +239,18 @@ NB = BLOCK;
 
 -- test --
 [%# evented capture anon block and edirectives -%]
-3[%
+4[%
 NB = BLOCK;
+   2; " ";
    USE s = Second;
    EVENT res = s.start(1);
    res.result;
    " ";
    IF 1; 1; ELSE; 0; END;
-%]
-[% END %] 2 [% NB %]
+-%]
+[% END %] 3 [% NB %] z
 -- expect --
-3 2 ok 1
+4 3 2 ok 1 z
 
 -- test --
 [% # check localization variable for PROCESS/INCLUDE

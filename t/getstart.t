@@ -29,6 +29,7 @@ my $res = $tt->process('the_start',{},\$out);
 
 my $expect = "The start\n";
 
+print $out unless( $out eq $expect );
 ok( $out eq $expect, "result equal expect value");
 
 done_testing;
