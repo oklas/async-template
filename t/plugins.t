@@ -228,6 +228,72 @@ END;
 4d3Eec2Bb1BEeaEeB
 
 -- test --
+[%# evented IF simple -%]
+[%
+   USE s = Second;
+   r = { result => 1 };
+   EVENT r = s.start(0) IF 0; r.result;
+   EVENT r = s.start(0) IF 1; r.result;
+   r = { result => 2 };
+   EVENT r = s.start(0) UNLESS 1; r.result;
+   EVENT r = s.start(0) UNLESS 0; r.result;
+-%]
+-- expect --
+1ok2ok
+
+-- test --
+[%# evented IF with else -%]
+[%
+   USE s = Second;
+   r_one = { result => 1 }; 
+#
+   r=r_one; IF 0; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; IF 1; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; UNLESS 1; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; UNLESS 0; EVENT r = s.start(0); END; r.result;
+"\n";
+   r=r_one; IF 1; 2; ELSE; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; IF 0; 2; ELSE; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; UNLESS 0; 2; ELSE; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; UNLESS 1; 2; ELSE; EVENT r = s.start(0); END; r.result;
+"\n";
+   r=r_one; IF 1; EVENT r = s.start(0); ELSE; 3; END; r.result; " ";
+   r=r_one; IF 0; EVENT r = s.start(0); ELSE; 3; END; r.result; " ";
+   r=r_one; UNLESS 0; EVENT r = s.start(0); ELSE; 3; END; r.result; " ";
+   r=r_one; UNLESS 1; EVENT r = s.start(0); ELSE; 3; END; r.result;
+-%]
+-- expect --
+1 ok 1 ok
+21 ok 21 ok
+ok 31 ok 31
+
+-- test --
+[%# evented IF with elsif -%]
+[%
+   USE s = Second;
+   r_one = { result => 1 }; 
+#
+   r=r_one; IF 1; EVENT r = s.start(0); ELSIF 0; 2; END; r.result; " ";
+   r=r_one; IF 0; EVENT r = s.start(0); ELSIF 1; 2; END; r.result; " ";
+   r=r_one; IF 1; 3; ELSIF 0; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; IF 0; 3; ELSIF 1; EVENT r = s.start(0); END; r.result;
+"\n";
+   r=r_one; UNLESS 1; ELSIF 1; EVENT r = s.start(0); ELSE; 4; END; r.result; " ";
+   r=r_one; UNLESS 1; ELSIF 0; EVENT r = s.start(0); ELSE; 4; END; r.result; " ";
+   r=r_one; UNLESS 1; ELSIF 1; 5; ELSE; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; UNLESS 1; ELSIF 0; 5; ELSE; EVENT r = s.start(0); END; r.result;
+"\n";
+   r=r_one; IF 0; ELSIF 1; EVENT r = s.start(0); ELSIF 0; 6; END; r.result; " ";
+   r=r_one; IF 0; ELSIF 0; EVENT r = s.start(0); ELSIF 1; 6; END; r.result; " ";
+   r=r_one; IF 0; ELSIF 1; 7; ELSIF 0; EVENT r = s.start(0); END; r.result; " ";
+   r=r_one; IF 0; ELSIF 0; 7; ELSIF 1; EVENT r = s.start(0); END; r.result;
+-%]
+-- expect --
+ok 21 31 ok
+ok 41 51 ok
+ok 61 71 ok
+
+-- test --
 [%# original capture anon block and edirectives -%]
 3[%
 NB = BLOCK;

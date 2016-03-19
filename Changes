@@ -1,14 +1,36 @@
 Revision history for Perl extension Async::Template
 
+0.10  Sat Mar 19 22:25:53 UTC 2016
+        - event implementation of IF/UNLESS/ELSIF/ELSE
+
+0.09  Mon Oct 5 13:48:29 2015
+        - fix typo in capture
+
+0.08  Sat May 23 20:59:53 2015
+        - event PROCESS/INCLUDE of external template documents 
+
+0.07  Fri May 15 08:37:20 2015 
+        - compatibility with original capture
+
+0.06  Wed Apr 29 19:11:05 2015
+        - event capture with anonimous blocks added
+
+0.05  Thu May 23 01:50:05 2013
+        - event implementation of PROCESS/INCLUDE/BLOCK added
+
+0.04  Thu May 16 23:35:07 2013
+	- event implementation of FOREACH added
+
+0.03  Thu Apr 25 23:57:48 2013
+        - event implementation of SWITCH/CASE/DEFAULT added
+
+0.02  Tue Oct 23 19:10:11 2012
+        - event implementation of WHILE opearator added
+
 0.01  Mon Oct  1 03:17:34 2012
-	- original version; created by h2xs 1.23 with options
+	- package version; created by h2xs 1.23 with options
 		--omit-XS --skip-exporter --omit-autoload --name Template::Event
         - baseline Template-Toolkit version 2.24
 
-
-0.02  Thu May 16 23:35:07 2013
-	- event implementation of FOREACH added
-
-0.03  Thu May 23 01:50:05 2013
-        - event implementation of PROCESS/INCLUDE added
-
+0.00  Fri Sen 28 19:10:11 2012
+        - first worked verion with async event plugin

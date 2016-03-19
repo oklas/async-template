@@ -99,14 +99,18 @@ event:
 
 event_directive:
             event_loop
+        |   event_condition
         |   event_switch
         |   event_process
 ;
 
-event_plug:  EVENT eventvar ';'
+event_plug:  event_atomdir ';'
                event_template       { $_[0]->location() .
                                       $factory->define_event(
-                                        $_[2]->[0], $_[2]->[1], $_[4])    }
+                                        $_[1]->[0], $_[1]->[1], $_[3])    }
+;
+
+event_atomdir: EVENT eventvar       { $_[2]                               }
 ;
 
 eventvar:   ident                   { [ undef, $factory->ident($_[1]) ]   }
@@ -185,12 +189,46 @@ event_process:
               event_template        { $factory->process(@_[2,3])          }
 ;
 
+event_condition: IF expr ';'
+              eventblock event_evnev_else END
+              event_template        { $factory->event_if(@_[2, 4, 5, 7], 'ev')  }
+        |   IF expr ';'
+              block event_else END
+              event_template        { $factory->event_if(@_[2, 4, 5, 7])  }
+        |   UNLESS expr ';'
+              eventblock event_evnev_else END
+              event_template        { $factory->event_if("!($_[2])", @_[4, 5, 7], 'ev') }
+        |   UNLESS expr ';'
+              block event_else END
+              event_template        { $factory->event_if("!($_[2])", @_[4, 5, 7]) }
+        |   event_atomdir IF expr ';'
+              event_template        { $factory->event_if_directive(
+                                        $_[1]->[0], $_[1]->[1], $_[3], $_[5] ) }
+        |   event_atomdir UNLESS expr ';'
+              event_template        { $factory->event_if_directive(
+                                        $_[1]->[0], $_[1]->[1], "!($_[3])", $_[5] ) }
+;
+
 condition:  IF expr ';' 
               block else END        { $factory->if(@_[2, 4, 5])           }
         |   atomexpr IF expr        { $factory->if(@_[3, 1])              }
         |   UNLESS expr ';'
               block else END        { $factory->if("!($_[2])", @_[4, 5])  }
         |   atomexpr UNLESS expr    { $factory->if("!($_[3])", $_[1])     }
+;
+
+event_evnev_else: else
+        |   event_else
+;
+
+event_else: ELSIF expr ';'
+              eventblock else       { unshift(@{$_[5]}, [ @_[2, 4], 'ev' ]); $_[5]; }
+        |   ELSIF expr ';'
+              block event_else      { unshift(@{$_[5]}, [ @_[2, 4] ]); $_[5]; }
+        |   ELSIF expr ';'
+              eventblock event_else { unshift(@{$_[5]}, [ @_[2, 4], 'ev' ]); $_[5]; }
+        |   ELSE ';'
+              eventblock            { [ [$_[3],'ev'] ] }
 ;
 
 else:       ELSIF expr ';' 
