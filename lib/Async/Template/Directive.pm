@@ -318,6 +318,102 @@ EOF
 }
 
 
+#------------------------------------------------------------------------
+# event_if_directive($expr, $resvar, $evexpr, $expr, $tail)
+#------------------------------------------------------------------------
+
+sub event_if_directive {
+   my ( $self, $resvar, $evexpr, $expr, $tail ) = @_;
+
+   $resvar = $resvar ? "'$resvar'" : 'undef';
+   $tail = $self->event_proc( $tail );
+
+   return << "END";
+my \$event_tail = $tail;
+if( $expr ) {
+   $evexpr;
+   \$context->event_push( {
+      resvar => $resvar,
+      event => \$event_tail,
+   } );
+} else {
+   \$event_tail->( \$context );
+}
+END
+
+}
+
+
+#------------------------------------------------------------------------
+# event_if($expr, $block, $else, $tail, $is_blk_ev)
+#------------------------------------------------------------------------
+
+sub event_if {
+   my ($self, $expr, $block, $else, $tail, $is_blk_ev ) = @_;
+   my $label ||= 'IF';
+
+   my @else = $else ? @$else : ();
+   $else = pop @else;
+#   $block = pad($block, 1) if $PRETTY;
+
+   $tail = $self->event_proc( $tail );
+
+   my $output = << "END";
+my \$event_tail = $tail;
+END
+
+   if( $is_blk_ev ) {
+      $block = << "END";
+\$context->event_push( {
+   event => \$event_tail,
+} );
+$block;
+return '';
+END
+   }
+
+   $output .= "if ($expr) {\n$block\n}\n";
+
+   foreach my $elsif (@else) {
+      ($expr, $block, $is_blk_ev) = @$elsif;
+      if( $is_blk_ev ) {
+         $block = << "END";
+\$context->event_push( {
+   event => \$event_tail,
+} );
+$block;
+return '';
+END
+         }
+#      $block = pad($block, 1) if $PRETTY;
+      $output .= "elsif ($expr) {\n$block\n}\n";
+   }
+
+   if (defined $else) {
+      $block = $else;
+      if( 'ARRAY' eq ref $else && 'ev' eq $else->[1] ) {
+         $block = $else->[0];
+         $block = << "END";
+\$context->event_push( {
+   event => \$event_tail,
+} );
+$block;
+return '';
+END
+      }
+#      $else = pad($else, 1) if $PRETTY;
+      $output .= "else {\n$block\n}\n";
+   }
+
+   $output .= << "END";
+\$event_tail->( \$context );
+END
+
+   return $output;
+
+}
+
+
 # WRNING: overloading only due to '${$ou}' instead '$output'
 #------------------------------------------------------------------------
 # capture($name, $block)
