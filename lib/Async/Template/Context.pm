@@ -25,14 +25,8 @@ sub set_event_output {
    $_[0]->{_event_output} = $_[1];
 }
 
-sub event_init {
-   die 'event alredy initiated' if $_[0]->{event_init};
-   $_[0]->{event_init} = 1;
-}
-
 sub event_done {
    my ( $self, $res ) = @_;
-   $self->{event_init} = undef;
    my $ev = $self->event_pop();
    $self->{event_top} = $ev;
    if( $ev->{resvar} ) {

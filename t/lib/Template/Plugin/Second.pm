@@ -28,18 +28,11 @@ sub new {
 }
 
 sub start {
-   my $self = shift;
-   my $second = shift;
-
-   # does not notify system if second is not specified ( for tests )
-   return unless defined $second;
-
-   # notify system that this is valid event holder
-   $self->{_CONTEXT}->event_init();
+   my ( $self, $second, $cb ) = @_;
 
    # notify system with error message if somthing wrong
    if ( $second < 0 ) {
-      $self->{_CONTEXT}->event_done( { error => "second($second) is must be positive" } );
+      $cb->( { error => "second($second) is must be positive" } );
       return;
    }
 
@@ -48,8 +41,7 @@ sub start {
       # now we at event handler    
 
       # notify system that event done with result any data at param
-      $self->{_CONTEXT}->event_done( { result => 'ok' } );
-
+      $cb->( { result => 'ok' } );
    };
 }
 

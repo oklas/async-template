@@ -42,6 +42,24 @@ END
 }
 
 
+sub event_cb {
+   return << "END";
+   sub { \$context->event_done( \@_ == 1 ? \$_[0] : \\\@_ ) }
+END
+}
+
+
+sub ident_eventify {
+   my ( $self, $ident ) = @_;
+   my $last = $#{$ident};
+   my $params = $ident->[$last];
+   die 'event must be function call' unless ']' eq substr $params, -1;
+   my $cb = $self->event_cb;
+   $params =~ s/.$/, $cb \]/;
+   $ident->[$last] = $params;
+}
+
+
 #------------------------------------------------------------------------
 # event_template($block)
 #------------------------------------------------------------------------
