@@ -1,20 +1,8 @@
-#============================================================= -*-perl-*-
-#
-# t/plugins.t
-#
-# Test the Template::Plugins module.
-#
-# Written by Andy Wardley <abw@kfs.org>
-#
-# Copyright (C) 1996-2000 Andy Wardley.  All Rights Reserved.
-# Copyright (C) 1998-2000 Canon Research Centre Europe Ltd.
-#
-# This is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id$
-#
-#========================================================================
+
+#! @file
+#! @author: Serguei Okladnikov
+#! @date 20.07.2016
+#! @mailto: oklaspec@mail.ru
 
 use strict;
 use lib qw( t/lib ./lib ../lib ../blib/arch );
@@ -175,7 +163,7 @@ d2eq
 1aq
 
 -- test --
-[%# evented switch in while -%]
+[%# evented switch in foreach -%]
 [%
 USE s = Second;
 list = [ '4', 3, 2, '1' ];

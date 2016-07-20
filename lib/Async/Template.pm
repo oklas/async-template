@@ -79,6 +79,7 @@ sub process {
    ( defined $outstream && 'SCALAR' ne ref $outstream  ) &&
       die 'only string ref possible as outstream';
    my $context = $self->{tt}->context();
+   $context->event_clear;
    my $outstr = '';
    my $output = defined $outstream && 'SCALAR' eq ref $outstream ?
       $outstream : \$outstr;

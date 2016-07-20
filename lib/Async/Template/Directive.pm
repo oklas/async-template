@@ -22,12 +22,15 @@ sub {
    my \$stash   = \$context->stash;
    my \$out  = \$context->event_output;
    my \$_tt_error;
-#   eval { BLOCK: {
+   eval { BLOCK: {
 $block
-#   } };
+   } };
    if (\$@) {
-      \$_tt_error = \$context->catch(\$@, \\\$out);
-      die \$_tt_error unless \$_tt_error->type eq 'return';
+      \$_tt_error = \$context->catch(\$@, \$context->event_output);
+      if( \$_tt_error->type eq 'return' )
+         { \$context->do_return( \$\$out ); }
+      else
+         { die \$_tt_error; }
    }
    return '';
 }
@@ -46,6 +49,12 @@ sub event_cb {
    return << "END";
    sub { \$context->event_done( \@_ == 1 ? \$_[0] : \\\@_ ) }
 END
+}
+
+
+# TODO: remove this function after refactoring back $out to $output
+sub return {
+    return "\$context->throw('return', '', \$out);";
 }
 
 
