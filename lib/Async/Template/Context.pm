@@ -25,10 +25,13 @@ sub set_event_output {
    $_[0]->{_event_output} = $_[1];
 }
 
+sub event_clear {
+   $_[0]->{event_stack} = [];
+}
+
 sub event_done {
    my ( $self, $res ) = @_;
    my $ev = $self->event_pop();
-   $self->{event_top} = $ev;
    if( $ev->{resvar} ) {
       $self->stash->set( $ev->{resvar}, $res );
    }
@@ -36,7 +39,6 @@ sub event_done {
 # TODO: here exeptions not handled, and not reevented
 
    my $output = $ev->{event}->( $self, \$res );
-   $self->{event_top} = undef;
 }
 
 sub event_push {
@@ -49,11 +51,12 @@ sub event_pop {
 
 sub event_top {
    return $_[0]->{event_stack}->[ $#{ $_[0]->{event_stack} } ];
-# ( 16.05.2013 ) TODO: remove any access to 
-# $self->{event_top} if no problem appeared later
-#   $_[0]->{event_top}
-#      ? $_[0]->{event_top}
-#      : $_[0]->{event_stack}->[ $#{ $_[0]->{event_stack} } ]
+}
+
+sub do_return {
+   my ( $self, $res ) = @_;
+   my $ev = $self->{event_stack}->[0];
+   $ev->{event}->( $self, $res );
 }
 
 
