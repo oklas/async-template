@@ -119,7 +119,40 @@ sub error {
    $self->{tt}->error( @_ )
 }
 
+# This tt impl give not good perforance
+# will be removed or rewrited with
+sub tt {
+   my $cb = pop;
+   my $src = pop;
+   my $vars = ( 1==@_ && 'HASH' eq ref $_[0] ) ? $_[0] : {@_};
+   my ($out,$err,$res);
+   my $msg = 'two param or two elements array only for RESULT()';
+   $vars->{RESULT} ||= sub {
+      if( 2 == @_ ) {
+         ( $err, $res ) = ($_[0],$_[1]);
+      } elsif( 1 == @_ ) {
+         ( $err, $res ) = 'ARRAY' eq ref $_[0] ?
+            ($_[0][0],$_[0][1]) : ($msg,$_[0]);
+      } else {
+         ( $err, $res ) = ($msg,\@_);
+      };
+      $err
+   };
+   my $tt = Async::Template->new( { EVENT => sub {
+      $cb->($err,$res,$out);
+   } } );
+   $src =~ s/(.*)/[%$1%]/s;
+   $tt->process( \$src, $vars, \$out );
+}
 
+sub import {
+   my $package = shift;
+   my $caller = caller;
+   no strict 'refs';
+   if( $_[0] && $_[0] eq 'tt' ) {
+     *{$caller.'::tt'} = \&{$package.'::tt'};
+   }
+}
 
 1;
 
