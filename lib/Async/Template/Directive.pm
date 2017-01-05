@@ -62,9 +62,11 @@ sub ident_eventify {
    my ( $self, $ident ) = @_;
    my $last = $#{$ident};
    my $params = $ident->[$last];
+   $params = '[]' if $params eq '0';
    die 'event must be function call' unless ']' eq substr $params, -1;
    my $cb = $self->event_cb;
-   $params =~ s/.$/, $cb \]/;
+   my $comma = $params =~ /^\[\s*\]$/ ? '' : ',';
+   $params =~ s/.$/$comma $cb \]/;
    $ident->[$last] = $params;
 }
 
