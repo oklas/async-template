@@ -95,7 +95,7 @@ EOF
 
 sub define_event {
    my ( $self, $resvar, $expr, $event ) = @_;
-   $resvar = $resvar ? "'$resvar'" : 'undef';
+   $resvar = '[' . join(', ', @$resvar) . ']' if $resvar;
    $event = $self->event_proc( $event );
    return << "END";
    
@@ -354,7 +354,7 @@ EOF
 sub event_if_directive {
    my ( $self, $resvar, $evexpr, $expr, $tail ) = @_;
 
-   $resvar = $resvar ? "'$resvar'" : 'undef';
+   $resvar = '[' . join(', ', @$resvar) . ']' if $resvar;
    $tail = $self->event_proc( $tail );
 
    return << "END";

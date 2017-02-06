@@ -24,7 +24,7 @@
 # COPYRIGHT
 #   Copyright (C) 1996-2004 Andy Wardley.  All Rights Reserved.
 #   Copyright (C) 1998-2004 Canon Research Centre Europe Ltd.
-#   Copyright (C) 2012-2015 Serguei Okladnikov
+#   Copyright (C) 2012-2017 Serguei Okladnikov
 #
 #   This module is free software; you can redistribute it and/or
 #   modify it under the same terms as Perl itself.
@@ -110,15 +110,22 @@ event_plug:  event_atomdir ';'
                                         $_[1]->[0], $_[1]->[1], $_[3])    }
 ;
 
-event_atomdir: EVENT eventvar       { $_[2]                               }
+event_atomdir: eventcall            { $_[1]                               }
+        |      awaitcall            { $_[1]                               }
 ;
 
-eventvar:   ident                   { $factory->ident_eventify( $_[1] );
-                                      [ undef, $factory->ident($_[1]) ]   }
-        |   IDENT ASSIGN ident      { $factory->ident_eventify( $_[3] );
-                                      [ $_[1], $factory->ident($_[3]) ]   }
+eventcall:  EVENT ident             { $factory->ident_eventify( $_[2] );
+                                      [ undef, $factory->ident($_[2]) ]   }
+        |   EVENT ident ASSIGN ident { $factory->ident_eventify( $_[4] );
+                                      [ $_[2], $factory->ident($_[4]) ]   }
 ;
- 
+
+awaitcall:  AWAIT ident             { $factory->ident_eventify( $_[2] );
+                                      [ undef, $factory->ident($_[2]) ]   }
+        |   ident ASSIGN AWAIT ident { $factory->ident_eventify( $_[4] );
+                                      [ $_[1], $factory->ident($_[4]) ] }
+;
+
 chunk:      TEXT                    { $factory->textblock($_[1])          }
         |   statement ';'           { return '' unless $_[1];
                                       $_[0]->location() . $_[1];
