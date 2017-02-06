@@ -346,3 +346,14 @@ a123b123c123
 -- expect --
 a123b123c123
 
+-- test --
+[% # await operator
+USE Second;
+FOREACH rec = [0.25, 0.125];
+   r = AWAIT Second.start(rec, 2*rec);
+   "${rec}-${r.result}~";
+END
+%]
+-- expect --
+0.25-0.5~0.125-0.25~
+

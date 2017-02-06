@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use base 'Template::Plugin';
 use AnyEvent;
+use Time::HiRes;
 
 our $VERSION = 0.01;
 our $DYNAMIC = 0 unless defined $DYNAMIC;
@@ -27,8 +28,14 @@ sub new {
    }, $class
 }
 
+sub now {
+  scalar Time::HiRes::time();
+}
+
 sub start {
-   my ( $self, $second, $cb ) = @_;
+   my $cb = pop @_;
+   my ( $self, $second, $value ) = @_;
+   $value = 'ok' if 2 == scalar @_;
 
    # notify system with error message if somthing wrong
    if ( $second < 0 ) {
@@ -41,7 +48,7 @@ sub start {
       # now we at event handler    
 
       # notify system that event done with result any data at param
-      $cb->( { result => 'ok' } );
+      $cb->( { result => $value } );
    };
 }
 
