@@ -59,15 +59,45 @@ sub return {
 
 
 sub ident_eventify {
-   my ( $self, $ident ) = @_;
+   my ( $self, $ident, $event_cb ) = @_;
    my $last = $#{$ident};
    my $params = $ident->[$last];
    $params = '[]' if $params eq '0';
    die 'event must be function call' unless ']' eq substr $params, -1;
-   my $cb = $self->event_cb;
+   my $cb = $event_cb || $self->event_cb;
    my $comma = $params =~ /^\[\s*\]$/ ? '' : ',';
    $params =~ s/.$/$comma $cb \]/;
    $ident->[$last] = $params;
+}
+
+
+sub async_call {
+   my ( $self, $resvar, $ident ) = @_;
+   my ( $RES, $CB ) = (0,1);
+
+   $resvar = '[' . join(', ', @$resvar) . ']' if $resvar;
+   $self->ident_eventify($ident, "\$async_cb");
+   my $expr = $self->ident( $ident );
+
+   return << "END";
+
+   my \$rescb = [ undef, undef ];
+   my \$async_cb = sub {
+     if( \$rescb->[$CB] )
+       { \$rescb->[$CB]->(\@_); }
+     else
+       { \$rescb->[$RES] = \\\@_ }
+   };
+   my \$await_cb = sub {
+     my \$cb = pop;
+     if( \$rescb->[$RES] )
+       { \$cb->( \@{\$rescb->[$RES]} ); }
+     else
+       { \$rescb->[$CB] = \$cb; }
+   };
+   \$stash->set($resvar, \$await_cb);
+   $expr;
+END
 }
 
 

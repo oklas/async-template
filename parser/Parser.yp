@@ -123,7 +123,10 @@ eventcall:  EVENT ident             { $factory->ident_eventify( $_[2] );
 awaitcall:  AWAIT ident             { $factory->ident_eventify( $_[2] );
                                       [ undef, $factory->ident($_[2]) ]   }
         |   ident ASSIGN AWAIT ident { $factory->ident_eventify( $_[4] );
-                                      [ $_[1], $factory->ident($_[4]) ] }
+                                      [ $_[1], $factory->ident($_[4]) ]   }
+;
+
+async_call: ident ASSIGN ASYNC ident { $factory->async_call($_[1],$_[4]); }
 ;
 
 chunk:      TEXT                    { $factory->textblock($_[1])          }
@@ -147,6 +150,7 @@ statement:  directive
 
 directive:  setlist                 { $factory->set($_[1])                }
         |   atomdir
+        |   async_call
         |   condition
         |   switch
         |   loop

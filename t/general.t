@@ -357,3 +357,33 @@ END
 -- expect --
 0.25-0.5~0.125-0.25~
 
+-- test --
+[% # async-await togather
+USE s0 = Second;
+USE s1 = Second;
+quick = 0.25;
+slow  = 0.5;
+list = [[quick,slow], [slow,quick]];
+list.push(list.0,list.1);
+FOREACH rec = list;
+   start = s1.now;
+   r0 = ASYNC s0.start(rec.0, rec.0+1);
+   r1 = ASYNC s1.start(rec.1, rec.1+1);
+   r0 = AWAIT r0;
+   r1 = AWAIT r1;
+   "res0 " IF rec.0+1 == r0.result;
+   "res1 " IF rec.1+1 == r1.result;
+   finish = s1.now;
+   max = rec.0 > rec.1 ? rec.0 : rec.1;
+   min = rec.0 < rec.1 ? rec.0 : rec.1;
+   "min " IF start + max <= finish;
+   "max " IF start + max + min > finish;
+   "ok\n";
+END
+%]
+-- expect --
+res0 res1 min max ok
+res0 res1 min max ok
+res0 res1 min max ok
+res0 res1 min max ok
+
