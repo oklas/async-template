@@ -1,6 +1,18 @@
 Revision history for Perl extension Async::Template
 
-0.10  Sat Mar 19 22:25:53 UTC 2016
+      Mon Mar 20 17:27:51 2017 +0400
+        - add ASYNC operator doing async call and return handle for AWAIT
+
+      Mon Feb 6 14:30:53 2017
+        - add AWAIT operator like EVENT operator but after '=' (equal sign)
+
+      Fri Dec 23 23:50:45 2016
+        - add tt function
+
+      Wed Jul 20 21:10:25 2016
+        - event implementation of RETURN
+
+0.10  Sat Mar 19 22:25:53 2016
         - event implementation of IF/UNLESS/ELSIF/ELSE
 
 0.09  Mon Oct 5 13:48:29 2015
