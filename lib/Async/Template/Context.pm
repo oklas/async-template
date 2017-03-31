@@ -4,6 +4,13 @@ package Async::Template::Context;
 #! @author: Serguei Okladnikov <oklaspec@gmail.com>
 #! @date 01.10.2012
 
+#! This source file have functions `process_enter()` and `process_leave()`.
+#! Code parts of them taken from function `process()` of template toolkit
+#! library and substantially enhanced, the asynchronous processing
+#! is introduced by Serguei Okladnikov <oklaspec@gmail.com>
+#! Author of that original code parts is Andy Wardley <abw@wardley.org>
+
+
 use strict;
 use warnings;
 use base 'Template::Context';
