@@ -1,8 +1,7 @@
 
 #! @file
-#! @author: Serguei Okladnikov
+#! @author: Serguei Okladnikov <oklaspec@gmail.com>
 #! @date 20.07.2016
-#! @mailto: oklaspec@mail.ru
 
 use strict;
 use lib qw( t/lib ./lib ../lib ../blib/arch );

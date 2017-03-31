@@ -5,9 +5,12 @@
 # DESCRIPTION
 #   Definition of the parser grammar for the Template Toolkit language.
 #
+#   This grammar teken ftom Template perl library and modified by Serguei
+#   Okladnikov to integrate asynchronous EVENT, ASYNC and AWAIT operators
+#
 # AUTHOR
 #   Andy Wardley <abw@wardley.org> 
-#   Serguei Okladnikov <oklas@cpan.org> (EVENTs and some features)
+#   Serguei Okladnikov <oklaspec@gmail.com> (EVENT/ASYNC/AWAIT and some more)
 #
 # HISTORY
 #   Totally re-written for version 2, based on Doug Steinwand's 

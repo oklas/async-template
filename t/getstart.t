@@ -1,6 +1,6 @@
 
 #! @file
-#! @author Serguei Okladnikov oklaspec@gmail.com
+#! @author: Serguei Okladnikov <oklaspec@gmail.com>
 #! @date 2015.05.30
 
 use strict;

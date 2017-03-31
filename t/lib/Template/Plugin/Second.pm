@@ -1,9 +1,8 @@
 package Template::Plugin::Second;
 
-
-#! @author: Serguei Okladnikov
+#! @file
+#! @author: Serguei Okladnikov <oklaspec@gmail.com>
 #! @date 01.10.2012
-#! @mailto: oklaspec@mail.ru
 
 use strict;
 use warnings;
