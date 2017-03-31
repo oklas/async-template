@@ -1,8 +1,8 @@
 package Async::Template::Provider;
 
-#! @author: Serguei Okladnikov
+#! @file
+#! @author: Serguei Okladnikov <oklaspec@gmail.com>
 #! @date 21.05.2015
-#! @mailto: oklaspec@gmail.com
 
 use base 'Template::Provider';
 

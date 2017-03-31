@@ -1,8 +1,8 @@
 package Async::Template::Directive;
 
-#! @author: Serguei Okladnikov
+#! @file
+#! @author: Serguei Okladnikov <oklaspec@gmail.com>
 #! @date 08.10.2012
-#! @mailto: oklaspec@mail.ru
 
 use strict;
 use warnings;
