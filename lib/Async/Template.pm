@@ -126,18 +126,22 @@ sub tt {
    my $src = pop;
    my $vars = ( 1==@_ && 'HASH' eq ref $_[0] ) ? $_[0] : {@_};
    my ($out,$err,$res);
-   my $msg = 'two param or two elements array only for RESULT()';
-   $vars->{RESULT} ||= sub {
+   my $msg = 'two param or two elements array only for RESULT() or ERROR()';
+
+   my $saveres = sub {
       if( 2 == @_ ) {
-         ( $err, $res ) = ($_[0],$_[1]);
+         ( $err, $res ) = ($_[0], $_[1]);
       } elsif( 1 == @_ ) {
          ( $err, $res ) = 'ARRAY' eq ref $_[0] ?
-            ($_[0][0],$_[0][1]) : ($msg,$_[0]);
+            ($_[0][0], $_[0][1]) : ($msg, $_[0]);
       } else {
-         ( $err, $res ) = ($msg,\@_);
+         ( $err, $res ) = ($msg, \@_);
       };
-      $err
    };
+
+   $vars->{ERROR} ||= sub { $saveres->(@_); $err };
+   $vars->{RESULT} ||= sub { $saveres->(@_); $res };
+
    my $tt = Async::Template->new( { EVENT => sub {
       $cb->($err,$res,$out);
    } } );
