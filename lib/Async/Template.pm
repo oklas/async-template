@@ -161,11 +161,10 @@ sub import {
 1;
 
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
-Async::Template - Perl extension for blah blah blah
+Async::Template - Async Template Toolkit
 
 =head1 SYNOPSIS
 
@@ -183,27 +182,34 @@ Blah blah blah.
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+=item L<AnyEvent::Handle>;
 
-If you have a mailing list set up for your module, mention it here.
+=item L<AnyEvent::HTTP>;
 
-If you have a web site set up for your module, mention it here.
+=item L<JSON::RPC2::AnyEvent::Client>;
 
 =head1 AUTHOR
 
-Serguei Okladnikov, E<lt>oklas@span.orgE<gt>
+Serguei Okladnikov E<lt>oklaspec@gmail.comE<gt>
 
+This "Async::Template" package contains parts of "Template Toolkit" and
+uses "Template Toolkit" as dependency. The "Template Toolkit" was written
+by Andy Wardley E<lt>abw@wardley.orgE<gt> with the invaluable assistance
+and contributions from many other people.
+See Template::Manual::Credits for details and repos contributors sections.
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENSE 
 
-Copyright (C) 2012 by Serguei Okladnikov
+Async::Template
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
+Copyright (C) 2012-present Serguei Okladnikov
+
+Template::Toolkit
+
+Copyright (C) 1996-present Andy Wardley.
+
+This is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 
 =cut
