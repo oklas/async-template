@@ -42,16 +42,16 @@ sub new {
 
    my $config = $_[0];
    
-   $self->{EVENT} = $config->{EVENT};
-   if( $config->{BLOCKER} && ! $config->{EVENT} ) {
-      die 'EVENT cofig options for '.__PACKAGE__.'->new() must be specified if BLOCKER specified'
-   } elsif( ! $config->{BLOCKER} && ! $config->{EVENT} ) {
+   $self->{DONE} = $config->{DONE};
+   if( $config->{BLOCKER} && ! $config->{DONE} ) {
+      die 'DONE cofig options for '.__PACKAGE__.'->new() must be specified if BLOCKER specified'
+   } elsif( ! $config->{BLOCKER} && ! $config->{DONE} ) {
       require 'AnyEvent.pm';
       $self->{_ourblocker} = 1;
       $self->{BLOCKER} = sub {
           $self->{_blockcv}->recv;
       };
-      $self->{EVENT} = sub {
+      $self->{DONE} = sub {
          my $output = shift;
          $self->{_output} = $output;
          $self->{_blockcv}->send;
@@ -60,7 +60,8 @@ sub new {
    $self->{config} = $config;
    $self->{tt} = Template->new({
       %{ $self->{config} },
-      PARSER  => Async::Template::Parser->new( %{$config},
+      PARSER  => Async::Template::Parser->new(
+          %{$config},
           GRAMMAR => Async::Template::Grammar->new( %{$config } ),
           FACTORY => Async::Template::Directive->new( %{$config} ),
       ),
@@ -84,7 +85,7 @@ sub process {
    my $output = defined $outstream && 'SCALAR' eq ref $outstream ?
       $outstream : \$outstr;
    $context->{_event_output} = $output;
-   my $cb = $options->{EVENT} || $self->{EVENT};
+   my $cb = $options->{DONE} || $self->{DONE};
    my $event = sub {
       my $context = shift;
       $cb->( ${$context->event_output()} );
@@ -142,7 +143,7 @@ sub tt {
    $vars->{ERROR} ||= sub { $saveres->(@_); $err };
    $vars->{RESULT} ||= sub { $saveres->(@_); $res };
 
-   my $tt = Async::Template->new( { EVENT => sub {
+   my $tt = Async::Template->new( { DONE => sub {
       $cb->($err,$res,$out);
    } } );
    $src =~ s/(.*)/[%$1%]/s;
