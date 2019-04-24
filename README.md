@@ -1,40 +1,45 @@
-Async-Template version 0.01
-===========================
+# NAME
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Async::Template - Async Template Toolkit
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
+# SYNOPSIS
 
-INSTALLATION
+    use Async::Template;
+    blah blah blah
 
-To install this module type the following:
+# DESCRIPTION
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+Stub documentation for Async::Template, created by h2xs. It looks like the
+author of the extension was negligent enough to leave the stub
+unedited.
 
-DEPENDENCIES
+Blah blah blah.
 
-This module requires these other modules and libraries:
+# SEE ALSO
 
-  blah blah blah
+- [AnyEvent::Handle](https://metacpan.org/pod/AnyEvent::Handle);
+- [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP);
+- [JSON::RPC2::AnyEvent::Client](https://metacpan.org/pod/JSON::RPC2::AnyEvent::Client);
 
-COPYRIGHT AND LICENCE
+# AUTHOR
 
-Put the correct copyright and licence information here.
+Serguei Okladnikov <oklaspec@gmail.com>
 
-Copyright (C) 2012 by Serguei Okladnikov
+This "Async::Template" package contains parts of "Template Toolkit" and
+uses "Template Toolkit" as dependency. The "Template Toolkit" was written
+by Andy Wardley <abw@wardley.org> with the invaluable assistance
+and contributions from many other people.
+See Template::Manual::Credits for details and repos contributors sections.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
+# COPYRIGHT AND LICENSE 
 
-mailto: oklas@span.org
+Async::Template
+
+Copyright (C) 2012-present Serguei Okladnikov
+
+Template::Toolkit
+
+Copyright (C) 1996-present Andy Wardley.
+
+This is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -183,11 +183,16 @@ Blah blah blah.
 
 =head1 SEE ALSO
 
+=over
+
 =item L<AnyEvent::Handle>;
 
 =item L<AnyEvent::HTTP>;
 
 =item L<JSON::RPC2::AnyEvent::Client>;
+
+=back
+
 
 =head1 AUTHOR
 
