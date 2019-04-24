@@ -15,31 +15,18 @@ unedited.
 
 Blah blah blah.
 
-# SEE ALSO
-
-- [AnyEvent::Handle](https://metacpan.org/pod/AnyEvent::Handle);
-- [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP);
-- [JSON::RPC2::AnyEvent::Client](https://metacpan.org/pod/JSON::RPC2::AnyEvent::Client);
-
 # AUTHOR
 
 Serguei Okladnikov <oklaspec@gmail.com>
 
-This "Async::Template" package contains parts of "Template Toolkit" and
-uses "Template Toolkit" as dependency. The "Template Toolkit" was written
-by Andy Wardley <abw@wardley.org> with the invaluable assistance
-and contributions from many other people.
-See Template::Manual::Credits for details and repos contributors sections.
+This [Async::Template](https://metacpan.org/pod/Async::Template) package uses "Template Toolkit" ([Template](https://metacpan.org/pod/Template))
+as dependency and contains small amount modified parts of "Template Toolkit"
+(modified grammar and continuous synchronous code which is splitted for
+execution asynchronous sequences). The "Template Toolkit" was written
+by Andy Wardley <abw@wardley.org> and contributors, see
+Template::Manual::Credits for details and repos contributors sections.
 
-# COPYRIGHT AND LICENSE 
-
-Async::Template
-
-Copyright (C) 2012-present Serguei Okladnikov
-
-Template::Toolkit
-
-Copyright (C) 1996-present Andy Wardley.
+# LICENSE 
 
 This is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the same terms as Perl itself
