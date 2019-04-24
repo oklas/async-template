@@ -29,7 +29,7 @@ sub new {
    $Template::Config::DOCUMENT = 'Async::Template::Document';
    $Template::Config::PROVIDER = 'Async::Template::Provider';
 
-# WARN! TODO: incompatible with original tewmplate
+# WARN! TODO: incompatible with original template
 # impossible to solve upgrade Template does not
 # recompile unchaged modules, incomptible ...
 # $output and \$output need to test mem usage
@@ -181,41 +181,23 @@ unedited.
 Blah blah blah.
 
 
-=head1 SEE ALSO
-
-=over
-
-=item L<AnyEvent::Handle>;
-
-=item L<AnyEvent::HTTP>;
-
-=item L<JSON::RPC2::AnyEvent::Client>;
-
-=back
-
-
 =head1 AUTHOR
 
 Serguei Okladnikov E<lt>oklaspec@gmail.comE<gt>
 
-This "Async::Template" package contains parts of "Template Toolkit" and
-uses "Template Toolkit" as dependency. The "Template Toolkit" was written
-by Andy Wardley E<lt>abw@wardley.orgE<gt> with the invaluable assistance
-and contributions from many other people.
-See Template::Manual::Credits for details and repos contributors sections.
+This L<Async::Template> package uses "Template Toolkit" (L<Template>)
+as dependency and contains small amount modified parts of "Template Toolkit"
+(modified grammar and continuous synchronous code which is splitted for
+execution asynchronous sequences). The "Template Toolkit" was written
+by Andy Wardley E<lt>abw@wardley.orgE<gt> and contributors, see
+Template::Manual::Credits for details and repos contributors sections.
 
-=head1 COPYRIGHT AND LICENSE 
 
-Async::Template
+=head1 LICENSE 
 
 Copyright (C) 2012-present Serguei Okladnikov
 
-Template::Toolkit
-
-Copyright (C) 1996-present Andy Wardley.
-
 This is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
+it under the same terms as Perl itself
 
 =cut
