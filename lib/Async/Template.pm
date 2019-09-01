@@ -169,8 +169,74 @@ Async::Template - Async Template Toolkit
 
 =head1 SYNOPSIS
 
-  use Async::Template;
-  blah blah blah
+   use Async::Template (tt);
+
+   $cv = AnyEvent->condvar;
+
+   my $tt = Async::Template->new({
+      # ... any Template options (see Template::Manual::Config)
+      INCLUDE_PATH => $src,
+      ENCODING => 'utf8',
+
+      # additional options provided by Async::Template
+
+      # optional blocker if only one blocking tt instance is required
+      # default AnyEvent blocker is enabled if no DONE handler is provided
+      BLOCKER => sub{ $cv->recv; },
+
+      # done handler - called when template process is finished
+      # default event loop and blocker is enabled if DONE is not specified
+      DONE => sub{ my $output = shift; $cv->send; },
+   }) || die Async::Template->error();
+
+   # single blocked process
+
+   my $tt = Async::Template->new({
+   }) || die Async::Template->error();
+   $tt->process($template, $vars, \$output)
+
+   # nonblocked multiple procesess
+
+   $cv = AnyEvent->condvar;
+   $cv->begin;
+   my $tt2 = Async::Template->new({
+      DONE => sub{ my $output = shift; $cv->end; },
+   }) || die Async::Template->error();
+   $cv->begin;
+   AnyEvent->timer(after => 10, cb => sub { $cv->end; });
+   $cv->recv
+
+   # slimplify to use Async Template Toolkit language
+   # in perl code for management async processes graph
+
+   $vars = {
+     some_async_fn => sub {
+        my ($param, $callback) = @_;
+        $callback->(error, result);
+     },
+     api => SomeObj->new({}),
+   }
+
+   tt $vars, << 'END',
+      USE timeout = Second;
+      AWAIT timeout.start(10)
+
+      r = AWAIT api.call('endpoint', {param = 'val'});
+      error = ERROR(r);
+      result = RESULT(r);
+      RETURN IF ERROR(r);
+
+      p2 = ASYNC some_async_fn('param');
+      p1 = ASYNC api.call('endpoint', {});
+      AWAIT p1;
+      AWAIT p2;
+      RETURN IF RESULT(r);
+    END
+    sub{
+       use Data::Dumper; warn Dumper \@_;
+       die $_[0] if($_[0]);
+       print 'result: ', $_[1];
+    };
 
 =head1 DESCRIPTION
 
