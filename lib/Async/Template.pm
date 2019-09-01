@@ -171,7 +171,7 @@ Async::Template - Async Template Toolkit
 
    use Async::Template (tt);
 
-   $cv = AnyEvent->condvar;
+   my $cv = AnyEvent->condvar;
 
    my $tt = Async::Template->new({
       # ... any Template options (see Template::Manual::Config)
@@ -189,15 +189,16 @@ Async::Template - Async Template Toolkit
       DONE => sub{ my $output = shift; $cv->send; },
    }) || die Async::Template->error();
 
+
    # single blocked process
 
-   my $tt = Async::Template->new({
-   }) || die Async::Template->error();
+   my $tt = Async::Template->new({}) || die Async::Template->error();
    $tt->process($template, $vars, \$output)
+
 
    # nonblocked multiple procesess
 
-   $cv = AnyEvent->condvar;
+   my $cv = AnyEvent->condvar;
    $cv->begin;
    my $tt2 = Async::Template->new({
       DONE => sub{ my $output = shift; $cv->end; },
@@ -206,10 +207,11 @@ Async::Template - Async Template Toolkit
    AnyEvent->timer(after => 10, cb => sub { $cv->end; });
    $cv->recv
 
+
    # slimplify to use Async Template Toolkit language
    # in perl code for management async processes graph
 
-   $vars = {
+   my $vars = {
      some_async_fn => sub {
         my ($param, $callback) = @_;
         $callback->(error, result);
@@ -240,11 +242,45 @@ Async::Template - Async Template Toolkit
 
 =head1 DESCRIPTION
 
-Stub documentation for Async::Template, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+Async::Template is the system which works as Template Toolkit with asynchronous
+application program interface and with asynchronous operators ASYNC/AWAIT which
+can be used with any event manage system.
 
-Blah blah blah.
+To refer Template Toolkit language syntax, configure options, params and other
+documentation folow this link L<Template>.
+
+Operators like ASYNC/AWAIT itself is not an function or something wich applied
+locally at the place where it is used in the code. Such operators affect all
+the code generation and the execution sequences. Any block of code cease to be
+a block if at least one async operator is exists in it. Loops, blocks,
+conditions, switches, and so on become different in synchronous and asynchronous
+implementations.
+
+For example a synchronous loop is continuous sequence which at the end of loop
+has a transition to the begin of the loop. But the asynchronous loop is not
+a continuos sequence and to do transition to the begin of loop typical loop
+operators can not be used because begin and end of loop located in different
+unjoined betwen each other code sequences (in a different fuctions).
+This is because at the middle of the loop at the place of async operator
+presents a finish of the execution and return. This return must be supported
+by each of parent block statement. Execution must be returned to the very top
+of the execution - to the event loop. And after awaited event condition is
+reached the execution must continue from that place from which it was returned.
+
+Therefore to develop a compiler with asynchronous operators we need to have
+different synchronous and asynchronous implementation for each block operator of
+language and many more. And for synchronous an asynchronous function call. This
+library represent itself compiler with modified grammar based on Template
+Toolkit. This library provides implementation of asynchronous operators and the
+code generation and asynchronous stack management and so on, uses itself as
+library for asynchronous sequences and uses Template Toolkit as library for
+execution generic synchronous sequences and also uses parts modified to be
+asynchronous.
+
+As mentioned above each block of code must be implemented differently therefore
+this library has asynchronous implementation for most of block operators of
+Template Toolkit language with the exception of operators enumerated in TODO
+file of this library repository. They are wanted to be implemented.
 
 
 =head1 AUTHOR

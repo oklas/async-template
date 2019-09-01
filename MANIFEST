@@ -10,7 +10,6 @@ lib/Async/Template/Grammar.pm
 lib/Async/Template/Parser.pm
 lib/Async/Template/Provider.pm
 parser/Grammar.pm.skel
-parser/Parser.output
 parser/Parser.yp
 parser/README
 parser/yc
