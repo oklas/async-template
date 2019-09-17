@@ -47,6 +47,8 @@
       },
       "runtime" : {
          "requires" : {
+            "HTML::Entities" : "0",
+            "Template::Toolkit" : "0",
             "perl" : "5.010001"
          }
       }
