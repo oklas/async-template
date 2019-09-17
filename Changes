@@ -1,5 +1,7 @@
 Revision history for Perl extension Async::Template
 
+{{$NEXT}}
+
       Mon Mar 20 17:27:51 2017 +0400
         - add ASYNC operator doing async call and return handle for AWAIT
 

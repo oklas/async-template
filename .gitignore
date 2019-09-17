@@ -1,6 +1,4 @@
 notes.txt
-MYMETA.json
-MYMETA.yml
 Makefile
 Makefile.old
 blib/
@@ -9,3 +7,11 @@ pm_to_blib
 stor/
 Async-Template-*.tar
 Async-Template-*.tar.gz
+/async-template-*
+/.build
+/_build_params
+/Build
+/Build.bat
+!Build/
+!META.json
+!LICENSE
