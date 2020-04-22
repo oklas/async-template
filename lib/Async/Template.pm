@@ -30,7 +30,7 @@ sub new {
    $Template::Config::PROVIDER = 'Async::Template::Provider';
 
 # WARN! TODO: incompatible with original template
-# impossible to solve upgrade Template does not
+# impossible to solve upgrade, Template does not
 # recompile unchaged modules, incomptible ...
 # $output and \$output need to test mem usage
 # about 2 commented string of code below
@@ -44,7 +44,8 @@ sub new {
    
    $self->{DONE} = $config->{DONE};
    if( $config->{BLOCKER} && ! $config->{DONE} ) {
-      die 'DONE cofig options for '.__PACKAGE__.'->new() must be specified if BLOCKER specified'
+      die 'DONE config options for ' . __PACKAGE__ .
+      '->new() must be specified if BLOCKER specified';
    } elsif( ! $config->{BLOCKER} && ! $config->{DONE} ) {
       require 'AnyEvent.pm';
       $self->{_ourblocker} = 1;
@@ -186,6 +187,7 @@ Async::Template - Async Template Toolkit
 
       # done handler - called when template process is finished
       # default event loop and blocker is enabled if DONE is not specified
+      # may be redefined at the process() function
       DONE => sub{ my $output = shift; $cv->send; },
    }) || die Async::Template->error();
 
@@ -289,9 +291,9 @@ Serguei Okladnikov E<lt>oklaspec@gmail.comE<gt>
 
 This L<Async::Template> package uses "Template Toolkit" (L<Template>)
 as dependency and contains small amount modified parts of "Template Toolkit"
-(modified grammar and continuous synchronous code which is splitted for
-execution asynchronous sequences). The "Template Toolkit" was written
-by Andy Wardley E<lt>abw@wardley.orgE<gt> and contributors, see
+(modified grammar and continuous synchronous code which was necessary
+to split for execution asynchronous sequences). The "Template Toolkit" was
+written by Andy Wardley E<lt>abw@wardley.orgE<gt> and contributors, see
 Template::Manual::Credits for details and repos contributors sections.
 
 
