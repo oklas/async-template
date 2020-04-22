@@ -105,6 +105,7 @@ event_directive:
         |   event_condition
         |   event_switch
         |   event_process
+        |   event_wrapper
 ;
 
 event_plug:  event_atomdir ';'
@@ -193,7 +194,7 @@ atomdir:    GET expr                { $factory->get($_[2])                }
                                           $_[0]->{ DEBUG_DIRS } ? $factory->debug($_[2]) : '';
                                       }
                                     }
-        |   wrapper
+#        |   wrapper
         |   filter
 ;
 
@@ -340,10 +341,13 @@ loopvar:    IDENT ASSIGN term args  { [ @_[1, 3, 4] ]                     }
         |   term args               { [ 0, @_[1, 2] ]                     }
 ;
 
-wrapper:    WRAPPER nameargs ';'
-              block END             { $factory->wrapper(@_[2, 4])         }
+event_wrapper:
+            WRAPPER nameargs ';'
+              block END
+              event_template        { $factory->event_wrapper(@_[2, 4, 6])}
         |   atomexpr 
-              WRAPPER nameargs      { $factory->wrapper(@_[3, 1])         }
+              WRAPPER nameargs
+              event_template        { $factory->event_wrapper(@_[3, 1, 4])}
 ;
 
 try:        TRY ';' 

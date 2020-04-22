@@ -180,6 +180,43 @@ EOF
 
 
 #------------------------------------------------------------------------
+# event_wrapper(\@nameargs, $block, $tail)  [% WRAPPER file foo = bar  %]
+#         # => [ [ $file, ... ], \@args ]      ...
+#                                           [% END %]
+#------------------------------------------------------------------------
+
+sub event_wrapper {
+    my ($self, $nameargs, $block, $event) = @_;
+    my ($file, $args) = @$nameargs;
+    my $hash = shift @$args;
+
+    local $" = ', ';
+#    print STDERR "wrapper([@$file], { @$hash })\n";
+
+    return $self->multi_wrapper($file, $hash, $block)
+        if @$file > 1;
+    $file = shift @$file;
+
+    $block = pad($block, 1) if $Template::Directive::PRETTY;
+    push(@$hash, "'content'", '${$out}');
+    $file .= @$hash ? ', { ' . join(', ', @$hash) . ' }' : '';
+    $event = $self->event_proc( $event );
+
+    return <<EOF;
+    # WRAPPER
+    my \$event = $event;
+    \$context->event_push( {
+        event => \$event,
+    } );
+    my \$output = ''; my \$out = \\\$output;
+$block
+    \$context->include($file);
+    return ''
+EOF
+}
+
+
+#------------------------------------------------------------------------
 # event_while($expr, $block, $tail)                    [% WHILE x < 10 %]
 #                                                         ...
 #                                                      [% END %]
@@ -473,7 +510,7 @@ END
 }
 
 
-# WRNING: overloading only due to '${$ou}' instead '$output'
+# WRNING: overloading only due to '${$out}' instead '$output'
 #------------------------------------------------------------------------
 # capture($name, $block)
 #------------------------------------------------------------------------
@@ -559,6 +596,5 @@ $on_capture;
 $block
 EOF
 }
-
 
 1;
