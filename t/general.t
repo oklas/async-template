@@ -386,3 +386,16 @@ res0 res1 min max ok
 res0 res1 min max ok
 res0 res1 min max ok
 
+-- test --
+[% WRAPPER wrapper + wrapperex %] the content [% END %]
+-- expect --
+start startex  the content  finishex finish
+
+-- test --
+[%
+  WRAPPER wrapper + wrapperex;
+  USE s = Second;
+  EVENT res = s.start(0);
+%] the async content [% END %]
+-- expect --
+start startex  the async content  finishex finish

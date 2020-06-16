@@ -27,7 +27,7 @@
 # COPYRIGHT
 #   Copyright (C) 1996-2004 Andy Wardley.  All Rights Reserved.
 #   Copyright (C) 1998-2004 Canon Research Centre Europe Ltd.
-#   Copyright (C) 2012-2017 Serguei Okladnikov
+#   Copyright (C) 2012-2020 Serguei Okladnikov
 #
 #   This module is free software; you can redistribute it and/or
 #   modify it under the same terms as Perl itself.
@@ -345,6 +345,9 @@ event_wrapper:
             WRAPPER nameargs ';'
               block END
               event_template        { $factory->event_wrapper(@_[2, 4, 6])}
+        |    WRAPPER nameargs ';'
+              eventblock END
+              event_template        { $factory->event_wrapper(@_[2, 4, 6], 'ev')}
         |   atomexpr 
               WRAPPER nameargs
               event_template        { $factory->event_wrapper(@_[3, 1, 4])}

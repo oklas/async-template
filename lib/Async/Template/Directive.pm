@@ -180,44 +180,77 @@ EOF
 
 
 #------------------------------------------------------------------------
-# event_wrapper(\@nameargs, $block, $tail)  [% WRAPPER file foo = bar  %]
-#         # => [ [ $file, ... ], \@args ]      ...
-#                                           [% END %]
+# event_wrapper(\@nameargs, $block, $tail, $is_blk_ev)
+# \@nameargs => [ [ $file, ... ], \@args ] ]
+#                                     [% WRAPPER file1 + file2 foo=bar %]
+#                                     ...
+#                                     [% END %]
 #------------------------------------------------------------------------
 
 sub event_wrapper {
-    my ($self, $nameargs, $block, $event) = @_;
-    my ($file, $args) = @$nameargs;
-    my $hash = shift @$args;
+   my ($self, $nameargs, $block, $tail, $is_blk_ev) = @_;
 
-    local $" = ', ';
-#    print STDERR "wrapper([@$file], { @$hash })\n";
+   my ($files, $args) = @$nameargs;
+   my $hash = $args->[0];
+   push(@$hash, "'content'", '${$capture_output}');
+   my $inclargs .= '{ ' . join(', ', @$hash) . ' }';
+   my $name = '[' . join(', ', @$files) . ']';
 
-    return $self->multi_wrapper($file, $hash, $block)
-        if @$file > 1;
-    $file = shift @$file;
+   $block = pad($block, 1) if $Template::Directive::PRETTY;
 
-    $block = pad($block, 1) if $Template::Directive::PRETTY;
-    push(@$hash, "'content'", '${$out}');
-    $file .= @$hash ? ', { ' . join(', ', @$hash) . ' }' : '';
-    $event = $self->event_proc( $event );
+   if( !$is_blk_ev ) {
+      $block .= $self->event_finalize;
+   }
 
-    return <<EOF;
-    # WRAPPER
-    my \$event = $event;
-    \$context->event_push( {
-        event => \$event,
-    } );
-    my \$output = ''; my \$out = \\\$output;
+   my $iteration = << "___EOF";
+      # WRAPPER LOOP
+      my \$capture_output = \$context->event_output;
+      my \$next_output = '';
+      \$context->set_event_output( \\\$next_output );
+      \$out = \$next_output;
+      if( scalar \@\$wrapper_files ) {
+         my \$file = pop \@\$wrapper_files;
+         \$context->event_push( {
+            event => \$iteration,
+         } );
+         \$context->process_enter(\$file, $inclargs, 'localize me');
+      } else {
+         my \$event_top = \$context->event_top();
+         my \$pop_output = \$event_top->{push_output};
+         \${\$pop_output} .= \${\$capture_output};
+         \$context->set_event_output( \$pop_output );
+         \$out = \$pop_output;
+$tail
+      }
+___EOF
+
+   $iteration = $self->event_proc( $iteration );
+
+   my $capture = << "___EOF";
+      # WRAPPER CONTENT CAPTURE
+      my \$push_out = \$context->event_output;
+      my \$event_top = \$context->event_top();
+      \$event_top->{push_output} = \$push_out;
+      my \$capture_out = '';
+      \$context->set_event_output( \\\$capture_out );
+      \$out = \\\$capture_out;
+      \$context->event_push( {
+         resvar => undef,
+         event  => \$iteration,
+      } );
 $block
-    \$context->include($file);
-    return ''
-EOF
+___EOF
+
+return << "___EOF";
+   my \$wrapper_files = $name;
+   my \$iteration; \$iteration = $iteration;
+$capture
+___EOF
 }
 
 
 #------------------------------------------------------------------------
-# event_while($expr, $block, $tail)                    [% WHILE x < 10 %]
+# event_while($expr, $block, $tail, $label)            [% WHILE x < 10 %]
 #                                                         ...
 #                                                      [% END %]
 #------------------------------------------------------------------------
