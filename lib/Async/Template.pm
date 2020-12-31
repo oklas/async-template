@@ -210,8 +210,7 @@ Async::Template - Async Template Toolkit
    $cv->recv
 
 
-   # slimplify to use Async Template Toolkit language
-   # in perl code for management async processes graph
+   # usage in perl code for async processes
 
    my $vars = {
      some_async_fn => sub {
@@ -242,11 +241,12 @@ Async::Template - Async Template Toolkit
        print 'result: ', $_[1];
     };
 
+
 =head1 DESCRIPTION
 
-Async::Template is the system which works as Template Toolkit with asynchronous
-application program interface and with asynchronous operators ASYNC/AWAIT which
-can be used with any event manage system.
+Async::Template is the same as Template Toolkit with asynchronous interface and
+with asynchronous operators ASYNC/AWAIT which can be used with any event
+management system (like L<AnyEvent>).
 
 To refer Template Toolkit language syntax, configure options, params and other
 documentation folow this link L<Template>.
@@ -269,7 +269,7 @@ by each of parent block statement. Execution must be returned to the very top
 of the execution - to the event loop. And after awaited event condition is
 reached the execution must continue from that place from which it was returned.
 
-Therefore to develop a compiler with asynchronous operators we need to have
+Therefore to develop a compiler with asynchronous operators it need to have
 different synchronous and asynchronous implementation for each block operator of
 language and many more. And for synchronous an asynchronous function call. This
 library represent itself compiler with modified grammar based on Template
@@ -279,10 +279,41 @@ library for asynchronous sequences and uses Template Toolkit as library for
 execution generic synchronous sequences and also uses parts modified to be
 asynchronous.
 
-As mentioned above each block of code must be implemented differently therefore
-this library has asynchronous implementation for most of block operators of
-Template Toolkit language with the exception of operators enumerated in TODO
-file of this library repository. They are wanted to be implemented.
+
+=head2 SYNC AND ASYNC BLOCKS 
+
+Continuous sequence of execution is tеaring at the place of AWAIT operator.
+The block is not only BLOCK operator statement but also IF, WHILE and etc...
+
+Any block become asynchronous if it have at least one AWAIT operator or
+another asynchronous block.
+
+Any block is synchronous if it does not contain AWAIT operator or another
+asynchronous block even if it has any amount of ASYNC opeartor
+
+Any block does not become asynchronous if it has ASYNC operator inside
+(if it has no AWAIT operator nor one or more asynchronous block).
+
+
+=head2 TODO
+
+As mentioned above, each block of code must be implemented differently
+therefore this library has asynchronous implementation for most of block
+operators of Template Toolkit language but not all yet.
+
+The block operators which is not implemented as asynchronous will work anyway
+with synchronous sequences (i.e. without AWAIT operator inside of it). 
+
+Here the list of Template Toolkit operators async implementation of which does
+not checked and/or implemented:
+
+NEXT LAST STOP
+
+MACRO FILTER
+
+TRY / THROW / CATCH / FINAL
+
+PERL / RAWPERL
 
 
 =head1 AUTHOR
@@ -298,8 +329,6 @@ Template::Manual::Credits for details and repos contributors sections.
 
 
 =head1 LICENSE 
-
-Copyright (C) 2012-present Serguei Okladnikov
 
 This is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself
