@@ -4,7 +4,7 @@
       "Serguei Okladnikov <oklaspec@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.6, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
-   "name" : "async-template",
+   "name" : "Async-Template",
    "no_index" : {
       "directory" : [
          "t",
@@ -65,7 +65,8 @@
          "web" : "https://github.com/oklas/async-template"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "version" : "0.12",
+   "x_authority" : "cpan:OKLAS",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

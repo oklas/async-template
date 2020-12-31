@@ -2,6 +2,8 @@ Revision history for Perl extension Async::Template
 
 {{$NEXT}}
 
+0.12 2020-12-31T14:59:49Z
+
       Mon Mar 20 17:27:51 2017 +0400
         - add ASYNC operator doing async call and return handle for AWAIT
 
