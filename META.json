@@ -51,6 +51,11 @@
             "Template::Toolkit" : "0",
             "perl" : "5.010001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0"
+         }
       }
    },
    "release_status" : "unstable",
